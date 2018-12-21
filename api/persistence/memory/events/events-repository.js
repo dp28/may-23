@@ -1,4 +1,5 @@
 const { matchesInMemory } = require("../apply-filters/filters");
+const { validatePresenceOfAll } = require("../../../domain/errors/validation");
 
 module.exports.buildEventRepository = () => {
   return {
@@ -12,19 +13,9 @@ module.exports.buildEventRepository = () => {
 let Events = [];
 
 async function store(event) {
-  ensureHas("id", event);
-  ensureHas("createdAt", event);
+  validatePresenceOfAll(["id", "createdAt"], event);
   await Events.push(event);
   return event;
-}
-
-function ensureHas(property, object) {
-  if (!object.hasOwnProperty(property)) {
-    throw validationError({
-      message: `Events must have a '${property}' property`,
-      property
-    });
-  }
 }
 
 async function count() {
@@ -39,14 +30,6 @@ async function find({ filters = [] } = {}) {
 
 async function removeAll() {
   Events = [];
-}
-
-function validationError({ message, property }) {
-  const error = new Error(message);
-  error.message = message;
-  error.property = property;
-  error.type = "VALIDATION_ERROR";
-  return error;
 }
 
 function compareCreatedAt(first, second) {

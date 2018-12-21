@@ -1,6 +1,7 @@
 const fs = require("fs").promises;
 const path = require("path");
 const { matchesInMemory } = require("../../memory/apply-filters/filters");
+const { validatePresenceOfAll } = require("../../../domain/errors/validation");
 
 module.exports.buildEventRepository = directory => {
   const EventsRepositoryFilePath = path.join(directory, "events.json");
@@ -33,21 +34,11 @@ module.exports.buildEventRepository = directory => {
   }
 
   async function store(event) {
-    ensureHas("id", event);
-    ensureHas("createdAt", event);
+    validatePresenceOfAll(["id", "createdAt"], event);
     const events = await load();
     events.push(event);
     await save(events);
     return event;
-  }
-
-  function ensureHas(property, object) {
-    if (!object.hasOwnProperty(property)) {
-      throw validationError({
-        message: `Events must have a '${property}' property`,
-        property
-      });
-    }
   }
 
   async function count() {
@@ -78,14 +69,6 @@ function transformEvent(rawEvent) {
     ...rawEvent,
     createdAt: new Date(rawEvent.createdAt)
   };
-}
-
-function validationError({ message, property }) {
-  const error = new Error(message);
-  error.message = message;
-  error.property = property;
-  error.type = "VALIDATION_ERROR";
-  return error;
 }
 
 function compareCreatedAt(first, second) {

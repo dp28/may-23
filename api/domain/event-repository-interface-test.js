@@ -1,4 +1,8 @@
 const { equal } = require("./filters/filters");
+const {
+  itShouldThrowAParameterMissingError,
+  itShouldThrowACannotBeBlankError
+} = require("./errors/error-test-helpers");
 
 module.exports.itShouldBehaveLikeAnEventRepository = buildEventRepository => {
   describe("an Event repository", () => {
@@ -19,24 +23,33 @@ module.exports.itShouldBehaveLikeAnEventRepository = buildEventRepository => {
         expect(await repository.count()).toEqual(1);
       });
 
-      it("throws an error if the object does not have an id", async () => {
-        try {
-          await repository.store({});
-          fail("Should have thrown an error");
-        } catch (error) {
-          expect(error.type).toEqual("VALIDATION_ERROR");
-          expect(error.property).toEqual("id");
-        }
+      describe("if the object does not have an id", () => {
+        itShouldThrowAParameterMissingError({
+          throwError: async () => await repository.store({}),
+          parameter: "id"
+        });
       });
 
-      it("throws an error if the object does not have a createdAt property", async () => {
-        try {
-          await repository.store({ id: "fake" });
-          fail("Should have thrown an error");
-        } catch (error) {
-          expect(error.type).toEqual("VALIDATION_ERROR");
-          expect(error.property).toEqual("createdAt");
-        }
+      describe("if the object has a falsy id", () => {
+        itShouldThrowACannotBeBlankError({
+          throwError: async () => await repository.store({ id: null }),
+          parameter: "id"
+        });
+      });
+
+      describe("if the object does not have a createdAt property", () => {
+        itShouldThrowAParameterMissingError({
+          throwError: async () => await repository.store({ id: "fake" }),
+          parameter: "createdAt"
+        });
+      });
+
+      describe("if the object has a falsy createdAt", () => {
+        itShouldThrowACannotBeBlankError({
+          throwError: async () =>
+            await repository.store({ id: "fake", createdAt: "" }),
+          parameter: "createdAt"
+        });
       });
     });
 
