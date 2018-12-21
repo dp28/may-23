@@ -1,9 +1,20 @@
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
+const path = require("path");
 
-const { typeDefs, resolvers } = require("./schema");
+const {
+  buildEventRepository
+} = require("./persistence/file-system/events/events-repository");
+const { typeDefs, resolvers } = require("./graphql");
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const dataDirectory = path.join(__dirname, "/local-data/");
+const eventRepository = buildEventRepository(dataDirectory);
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: { eventRepository }
+});
 
 const app = express();
 server.applyMiddleware({ app });
