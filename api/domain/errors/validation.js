@@ -2,14 +2,16 @@ const {
   UNKNOWN_ERROR,
   PARAMETER_MISSING,
   VALIDATION,
-  CANNOT_BE_BLANK
+  CANNOT_BE_BLANK,
+  DUPLICATE_ID
 } = require("./codes");
 
 module.exports = {
   validationError,
   parameterMissing,
   validatePresenceOf,
-  validatePresenceOfAll
+  validatePresenceOfAll,
+  duplicateId
 };
 
 function validatePresenceOfAll(parameters, object) {
@@ -46,6 +48,15 @@ function cannotBeBlank({ parameter }) {
     message: `'${parameter}' cannot be falsy`,
     code: CANNOT_BE_BLANK,
     parameter
+  });
+}
+
+function duplicateId({ entityName, id }) {
+  return buildError({
+    message: `'${entityName}' already exists with id '${id}'`,
+    code: DUPLICATE_ID,
+    duplicateId: id,
+    entityName
   });
 }
 

@@ -1,8 +1,20 @@
 const { EQUAL, NOT_EQUAL } = require("../../../domain/filters/filters");
 
-module.exports.matchesInMemory = (filters, object) => {
-  return filters.every(filter => singleFilterMatches(filter, object));
+module.exports = {
+  matchesInMemory,
+  applyFilters
 };
+
+function applyFilters({ filters = [] }, collection) {
+  if (filters.length === 0) {
+    return collection;
+  }
+  return collection.filter(object => matchesInMemory(filters, object));
+}
+
+function matchesInMemory(filters, object) {
+  return filters.every(filter => singleFilterMatches(filter, object));
+}
 
 function singleFilterMatches(filter, object) {
   const optionalValue = getValue(filter.propertyPath, object);

@@ -9,13 +9,14 @@ module.exports = {
 };
 
 function addPerson(args) {
-  validatePresenceOfAll(["firstName", "lastName"], args);
-  const { firstName, middleName, lastName } = args;
+  validatePresenceOfAll(["firstName", "lastName", "personId"], args);
+  const { firstName, middleName, lastName, personId } = args;
   return {
     id: generateId(),
     createdAt: new Date(),
     type: ADD_PERSON,
     data: {
+      personId,
       firstName: capitalize(firstName),
       lastName: capitalize(lastName),
       middleName: middleName ? capitalize(middleName) : null

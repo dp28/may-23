@@ -1,5 +1,7 @@
 const { gql } = require("apollo-server-express");
 const { addPerson } = require("../../domain/events/people");
+const { equal } = require("../../domain/filters/filters");
+const { duplicateId } = require("../../domain/errors/validation");
 
 module.exports = {
   addPersonMutation,
@@ -26,6 +28,19 @@ module.exports = {
   `
 };
 
-async function addPersonMutation(_, args, context) {
-  return await context.eventRepository.store(addPerson(args));
+async function addPersonMutation(_, args, { eventRepository }) {
+  await ensurePersonIdDoesNotAlreadyExist(args.personId, eventRepository);
+  return await eventRepository.store(addPerson(args));
+}
+
+async function ensurePersonIdDoesNotAlreadyExist(personId, eventRepository) {
+  const numberOfDupes = await eventRepository.count({
+    filters: [
+      equal(["data", "personId"], personId),
+      equal(["type"], "ADD_PERSON")
+    ]
+  });
+  if (numberOfDupes > 0) {
+    throw duplicateId({ entityName: "Person", id: personId });
+  }
 }

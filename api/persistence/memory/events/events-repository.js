@@ -1,5 +1,8 @@
-const { matchesInMemory } = require("../apply-filters/filters");
-const { validatePresenceOfAll } = require("../../../domain/errors/validation");
+const { applyFilters } = require("../apply-filters/filters");
+const {
+  validatePresenceOfAll,
+  duplicateId
+} = require("../../../domain/errors/validation");
 
 module.exports.buildEventRepository = () => {
   return {
@@ -14,18 +17,19 @@ let Events = [];
 
 async function store(event) {
   validatePresenceOfAll(["id", "createdAt"], event);
+  if (Events.some(_ => _.id === event.id)) {
+    throw duplicateId({ entityName: "Event", id: event.id });
+  }
   await Events.push(event);
   return event;
 }
 
-async function count() {
-  return Events.length;
+async function count({ filters } = {}) {
+  return applyFilters({ filters }, Events).length;
 }
 
-async function find({ filters = [] } = {}) {
-  return Events.filter(event => matchesInMemory(filters, event)).sort(
-    compareCreatedAt
-  );
+async function find({ filters } = {}) {
+  return applyFilters({ filters }, Events).sort(compareCreatedAt);
 }
 
 async function removeAll() {

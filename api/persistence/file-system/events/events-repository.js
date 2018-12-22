@@ -1,7 +1,10 @@
 const fs = require("fs").promises;
 const path = require("path");
-const { matchesInMemory } = require("../../memory/apply-filters/filters");
-const { validatePresenceOfAll } = require("../../../domain/errors/validation");
+const { applyFilters } = require("../../memory/apply-filters/filters");
+const {
+  validatePresenceOfAll,
+  duplicateId
+} = require("../../../domain/errors/validation");
 
 module.exports.buildEventRepository = directory => {
   const EventsRepositoryFilePath = path.join(directory, "events.json");
@@ -36,21 +39,22 @@ module.exports.buildEventRepository = directory => {
   async function store(event) {
     validatePresenceOfAll(["id", "createdAt"], event);
     const events = await load();
+    if (events.some(_ => _.id === event.id)) {
+      throw duplicateId({ entityName: "Event", id: event.id });
+    }
     events.push(event);
     await save(events);
     return event;
   }
 
-  async function count() {
+  async function count({ filters } = {}) {
     const events = await load();
-    return events.length;
+    return applyFilters({ filters }, events).length;
   }
 
-  async function find({ filters = [] } = {}) {
+  async function find({ filters } = {}) {
     const events = await load();
-    return events
-      .filter(event => matchesInMemory(filters, event))
-      .sort(compareCreatedAt);
+    return applyFilters({ filters }, events).sort(compareCreatedAt);
   }
 
   async function removeAll() {

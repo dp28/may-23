@@ -1,9 +1,10 @@
-const { PARAMETER_MISSING, CANNOT_BE_BLANK } = require("./codes");
+const { PARAMETER_MISSING, CANNOT_BE_BLANK, DUPLICATE_ID } = require("./codes");
 
 module.exports = {
   itShouldThrowAnError,
   itShouldThrowAParameterMissingError,
-  itShouldThrowACannotBeBlankError
+  itShouldThrowACannotBeBlankError,
+  itShouldThrowADuplicateIdError
 };
 const noop = () => {};
 
@@ -76,6 +77,32 @@ function itShouldThrowACannotBeBlankError({
       it(`should have a '${parameter}' property`, async () => {
         const error = await buildError();
         expect(error.parameter).toEqual(parameter);
+      });
+    }
+  });
+}
+
+function itShouldThrowADuplicateIdError({
+  throwError,
+  entityName,
+  message,
+  describeError = noop
+}) {
+  itShouldThrowAnError({
+    throwError,
+    code: DUPLICATE_ID,
+    message: message || new RegExp(`${entityName}.*already exists`),
+    describeError: buildError => {
+      describeError(buildError);
+
+      it(`should have an entityName property with the value '${entityName}'`, async () => {
+        const error = await buildError();
+        expect(error.entityName).toEqual(entityName);
+      });
+
+      it(`should have a duplicateId property`, async () => {
+        const error = await buildError();
+        expect(error.duplicateId).toBeTruthy();
       });
     }
   });

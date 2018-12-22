@@ -1,7 +1,8 @@
 const { equal } = require("./filters/filters");
 const {
   itShouldThrowAParameterMissingError,
-  itShouldThrowACannotBeBlankError
+  itShouldThrowACannotBeBlankError,
+  itShouldThrowADuplicateIdError
 } = require("./errors/error-test-helpers");
 
 module.exports.itShouldBehaveLikeAnEventRepository = buildEventRepository => {
@@ -51,6 +52,17 @@ module.exports.itShouldBehaveLikeAnEventRepository = buildEventRepository => {
           parameter: "createdAt"
         });
       });
+
+      describe("if an event has already been added with the same id", () => {
+        const addEvent = async () =>
+          await repository.store({ id: "fake", createdAt: new Date() });
+
+        beforeEach(addEvent);
+        itShouldThrowADuplicateIdError({
+          throwError: addEvent,
+          entityName: "Event"
+        });
+      });
     });
 
     describe("#find", () => {
@@ -78,7 +90,7 @@ module.exports.itShouldBehaveLikeAnEventRepository = buildEventRepository => {
         );
         await repository.store(
           buildEvent({
-            id: "fake1",
+            id: "fake3",
             shouldMatch: true,
             should: { match: false }
           })
@@ -111,6 +123,53 @@ module.exports.itShouldBehaveLikeAnEventRepository = buildEventRepository => {
         );
         const results = await repository.find();
         expect(results.map(_ => _.id)).toEqual(["fake2", "fake1", "fake3"]);
+      });
+    });
+
+    describe("#count", () => {
+      it("should return the number of all the events if no filters are applied", async () => {
+        const event = buildEvent();
+        await repository.store(event);
+        const number = await repository.count();
+        expect(number).toEqual(1);
+      });
+
+      it("should return the number of events that match the filters", async () => {
+        await repository.store(
+          buildEvent({
+            id: "fake1",
+            shouldMatch: true,
+            should: { match: true }
+          })
+        );
+        await repository.store(
+          buildEvent({
+            id: "fake2",
+            shouldMatch: false,
+            should: { match: true }
+          })
+        );
+        await repository.store(
+          buildEvent({
+            id: "fake3",
+            shouldMatch: true,
+            should: { match: false }
+          })
+        );
+        await repository.store(
+          buildEvent({
+            id: "fake4",
+            shouldMatch: true,
+            should: { match: true }
+          })
+        );
+        const number = await repository.count({
+          filters: [
+            equal(["shouldMatch"], true),
+            equal(["should", "match"], true)
+          ]
+        });
+        expect(number).toEqual(2);
       });
     });
   });

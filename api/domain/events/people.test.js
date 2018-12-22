@@ -6,7 +6,8 @@ const {
 const { addPerson, ADD_PERSON } = require("./people");
 
 describe("addPerson", () => {
-  const buildEvent = () => addPerson({ firstName: "Tom", lastName: "Riddle" });
+  const buildEvent = () =>
+    addPerson({ firstName: "Tom", lastName: "Riddle", personId: "fake_id" });
   const type = ADD_PERSON;
 
   it("should have an id", () => {
@@ -25,6 +26,10 @@ describe("addPerson", () => {
     expect(createdAt <= after).toBe(true);
   });
 
+  it("should have the passed-in personId data property", () => {
+    expect(buildEvent().data.personId).toBeTruthy();
+  });
+
   it(`should have the type '${type}'`, () => {
     expect(buildEvent().type).toEqual(type);
   });
@@ -37,7 +42,8 @@ describe("addPerson", () => {
     const event = addPerson({
       firstName: "Tom",
       middleName: "Marvolo",
-      lastName: "Riddle"
+      lastName: "Riddle",
+      personId: "fake_id"
     });
     expect(event.data.middleName).toEqual("Marvolo");
   });
@@ -74,6 +80,21 @@ describe("addPerson", () => {
     });
   });
 
+  describe("if there is no personId passed in", () => {
+    itShouldThrowAParameterMissingError({
+      throwError: () => addPerson({ firstName: "a", lastName: "a" }),
+      parameter: "personId"
+    });
+  });
+
+  describe("if an empty personId passed in", () => {
+    itShouldThrowACannotBeBlankError({
+      throwError: () =>
+        addPerson({ firstName: "a", lastName: "a", personId: "" }),
+      parameter: "personId"
+    });
+  });
+
   describe("if there is no middleName passed in", () => {
     it("should be set to null", () => {
       expect(buildEvent().data.middleName).toBe(null);
@@ -84,7 +105,8 @@ describe("addPerson", () => {
     expect(
       addPerson({
         firstName: "tom",
-        lastName: "r"
+        lastName: "r",
+        personId: "fake_id"
       }).data.firstName
     ).toEqual("Tom");
   });
@@ -93,7 +115,8 @@ describe("addPerson", () => {
     expect(
       addPerson({
         firstName: "tom",
-        lastName: "riddle"
+        lastName: "riddle",
+        personId: "fake_id"
       }).data.lastName
     ).toEqual("Riddle");
   });
@@ -103,7 +126,8 @@ describe("addPerson", () => {
       addPerson({
         firstName: "tom",
         middleName: "marvolo",
-        lastName: "riddle"
+        lastName: "riddle",
+        personId: "fake_id"
       }).data.middleName
     ).toEqual("Marvolo");
   });
