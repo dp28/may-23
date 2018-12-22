@@ -14,7 +14,7 @@ module.exports = {
 
     type AddPersonEvent {
       id: ID!
-      createdAt: String!
+      createdAt: Date!
       type: String!
       data: PersonData
     }

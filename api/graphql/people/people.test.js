@@ -50,7 +50,7 @@ describe(addPersonMutation, () => {
     });
   });
 
-  describe("if a a non ADD_PERSON event exists with the same personId", () => {
+  describe("if a non ADD_PERSON event exists with the same personId", () => {
     const input = {
       firstName: "Dupey",
       lastName: "McDupe",
