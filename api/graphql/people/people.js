@@ -6,7 +6,15 @@ const { duplicateId } = require("../../domain/errors/validation");
 module.exports = {
   addPersonMutation,
   typeDefs: gql`
+    input AddPersonInput {
+      personId: ID!
+      firstName: String!
+      lastName: String!
+      middleName: String
+    }
+
     type PersonData {
+      personId: ID!
       firstName: String!
       lastName: String!
       middleName: String
@@ -20,27 +28,20 @@ module.exports = {
     }
   `,
   mutationTypeDefs: `
-    addPerson(
-      firstName: String!
-      lastName: String!
-      middleName: String
-    ): AddPersonEvent
+    addPerson(input: AddPersonInput!): AddPersonEvent
   `
 };
 
-async function addPersonMutation(_, args, { eventRepository }) {
-  await ensurePersonIdDoesNotAlreadyExist(args.personId, eventRepository);
-  return await eventRepository.store(addPerson(args));
+async function addPersonMutation(_, { input }, { eventRepository }) {
+  await ensurePersonIdDoesNotAlreadyExist(input.personId, eventRepository);
+  return await eventRepository.store(addPerson(input));
 }
 
-async function ensurePersonIdDoesNotAlreadyExist(personId, eventRepository) {
+async function ensurePersonIdDoesNotAlreadyExist(id, eventRepository) {
   const numberOfDupes = await eventRepository.count({
-    filters: [
-      equal(["data", "personId"], personId),
-      equal(["type"], "ADD_PERSON")
-    ]
+    filters: [equal(["data", "personId"], id), equal(["type"], "ADD_PERSON")]
   });
   if (numberOfDupes > 0) {
-    throw duplicateId({ entityName: "Person", id: personId });
+    throw duplicateId({ entityName: "Person", id });
   }
 }
