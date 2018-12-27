@@ -2,10 +2,6 @@ const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
 const { gql } = require("apollo-server-express");
 
-const typeDefs = gql`
-  scalar Date
-`;
-
 const dateResolver = new GraphQLScalarType({
   name: "Date",
   description: "Date custom scalar type",
@@ -21,8 +17,10 @@ const dateResolver = new GraphQLScalarType({
 });
 
 module.exports = {
-  typeDefs,
-  resolverMap: {
+  typeDefs: gql`
+    scalar Date
+  `,
+  resolvers: {
     Date: dateResolver
   }
 };

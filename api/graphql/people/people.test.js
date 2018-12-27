@@ -1,4 +1,8 @@
-const { addPersonMutation } = require("./people");
+const {
+  resolvers: {
+    Mutation: { addPerson: addPersonMutation }
+  }
+} = require("./people");
 const { ADD_PERSON } = require("../../domain/events/people");
 const {
   itShouldThrowADuplicateIdError

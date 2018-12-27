@@ -4,32 +4,39 @@ const { equal } = require("../../domain/filters/filters");
 const { duplicateId } = require("../../domain/errors/validation");
 
 module.exports = {
-  addPersonMutation,
-  typeDefs: gql`
-    input AddPersonInput {
-      personId: ID!
-      firstName: String!
-      lastName: String!
-      middleName: String
-    }
+  typeDefs: [
+    gql`
+      input AddPersonInput {
+        personId: ID!
+        firstName: String!
+        lastName: String!
+        middleName: String
+      }
 
-    type PersonData {
-      personId: ID!
-      firstName: String!
-      lastName: String!
-      middleName: String
-    }
+      type PersonData {
+        personId: ID!
+        firstName: String!
+        lastName: String!
+        middleName: String
+      }
 
-    type AddPersonEvent {
-      id: ID!
-      createdAt: Date!
-      type: String!
-      data: PersonData
+      type AddPersonEvent {
+        id: ID!
+        createdAt: Date!
+        type: String!
+        data: PersonData
+      }
+
+      extend type Mutation {
+        addPerson(input: AddPersonInput!): AddPersonEvent
+      }
+    `
+  ],
+  resolvers: {
+    Mutation: {
+      addPerson: addPersonMutation
     }
-  `,
-  mutationTypeDefs: `
-    addPerson(input: AddPersonInput!): AddPersonEvent
-  `
+  }
 };
 
 async function addPersonMutation(_, { input }, { eventRepository }) {

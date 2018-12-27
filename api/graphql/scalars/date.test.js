@@ -1,6 +1,6 @@
 const { Kind } = require("graphql/language");
 const {
-  resolverMap: { Date: dateResolver }
+  resolvers: { Date: dateResolver }
 } = require("./date");
 
 describe("Date resolver", () => {

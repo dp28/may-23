@@ -21,7 +21,7 @@ function validatePresenceOfAll(parameters, object) {
 }
 
 function validatePresenceOf(parameter, object) {
-  if (!object.hasOwnProperty(parameter)) {
+  if (!Object.hasOwnProperty.call(object, parameter)) {
     throw parameterMissing({ parameter });
   }
   if (!object[parameter]) {

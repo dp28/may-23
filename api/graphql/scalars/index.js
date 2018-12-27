@@ -1,6 +1,3 @@
-const { typeDefs, resolverMap } = require("./date");
+const { mergeTypes } = require("../utils");
 
-module.exports = {
-  typeDefs,
-  resolverMap
-};
+module.exports = mergeTypes([require("./date")]);

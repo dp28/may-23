@@ -1,5 +1,5 @@
 const dateType = require("./date");
-const { typeDefs, resolverMap } = require("./date");
+const { typeDefs, resolvers } = require("./date");
 
 describe("Scalar typeDefs", () => {
   it("should include the Date typeDefs", () => {
@@ -7,10 +7,10 @@ describe("Scalar typeDefs", () => {
   });
 });
 
-describe("Scalar resolverMap", () => {
-  Object.entries(dateType.resolverMap).forEach(([typeName, resolver]) => {
+describe("Scalar resolvers", () => {
+  Object.entries(dateType.resolvers).forEach(([typeName, resolver]) => {
     it(`should include the resolver for the ${typeName}`, () => {
-      expect(resolverMap[typeName]).toEqual(resolver);
+      expect(resolvers[typeName]).toEqual(resolver);
     });
   });
 });
