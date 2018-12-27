@@ -53,7 +53,7 @@ function itShouldThrowAParameterMissingError({
     describeError: buildError => {
       describeError(buildError);
 
-      it(`should have a '${parameter}' property`, async () => {
+      it(`should have a parameter property with the value '${parameter}'`, async () => {
         const error = await buildError();
         expect(error.parameter).toEqual(parameter);
       });

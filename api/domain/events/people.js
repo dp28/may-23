@@ -5,11 +5,14 @@ const ADD_PERSON = "ADD_PERSON";
 
 module.exports = {
   addPerson,
-  ADD_PERSON
+  ADD_PERSON,
+  validatorMap: {
+    [ADD_PERSON]: validateAddPersonEventData
+  }
 };
 
 function addPerson(args) {
-  validatePresenceOfAll(["firstName", "lastName", "personId"], args);
+  validateAddPersonEventData(args);
   const { firstName, middleName, lastName, personId } = args;
   return {
     id: generateId(),
@@ -22,6 +25,10 @@ function addPerson(args) {
       middleName: middleName ? capitalize(middleName) : null
     }
   };
+}
+
+function validateAddPersonEventData(data) {
+  validatePresenceOfAll(["firstName", "lastName", "personId"], data);
 }
 
 function capitalize(word) {

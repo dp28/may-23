@@ -1,17 +1,19 @@
 const {
-  UNKNOWN_ERROR,
   PARAMETER_MISSING,
   VALIDATION,
   CANNOT_BE_BLANK,
-  DUPLICATE_ID
+  DUPLICATE_ID,
+  INVALID_PARAMETER
 } = require("./codes");
+const { buildError } = require("./error");
 
 module.exports = {
   validationError,
   parameterMissing,
   validatePresenceOf,
   validatePresenceOfAll,
-  duplicateId
+  duplicateId,
+  invalidParameter
 };
 
 function validatePresenceOfAll(parameters, object) {
@@ -43,6 +45,15 @@ function parameterMissing({ message, parameter }) {
   });
 }
 
+function invalidParameter({ reason, parameter }) {
+  const suffix = reason ? `: ${reason}` : "";
+  return buildError({
+    message: `invalid value for '${parameter}' parameter${suffix}`,
+    code: INVALID_PARAMETER,
+    parameter
+  });
+}
+
 function cannotBeBlank({ parameter }) {
   return buildError({
     message: `'${parameter}' cannot be falsy`,
@@ -58,11 +69,4 @@ function duplicateId({ entityName, id }) {
     duplicateId: id,
     entityName
   });
-}
-
-function buildError({ message, code, ...properties }) {
-  const error = new Error(message);
-  error.message = message || "An unknown error occurred";
-  error.code = code || UNKNOWN_ERROR;
-  return Object.assign(error, properties);
 }
