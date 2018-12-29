@@ -6,11 +6,11 @@ const { duplicateId } = require("../../domain/errors/validation");
 module.exports = {
   typeDefs: [
     gql`
-      input AddPersonInput {
-        personId: ID!
-        firstName: String!
-        lastName: String!
-        middleName: String
+      type AddPersonEvent implements Event {
+        id: ID!
+        createdAt: Date!
+        type: String!
+        data: PersonData
       }
 
       type PersonData {
@@ -20,11 +20,18 @@ module.exports = {
         middleName: String
       }
 
-      type AddPersonEvent implements Event {
+      input AddPersonEventInput {
         id: ID!
         createdAt: Date!
         type: String!
-        data: PersonData
+        data: AddPersonInput
+      }
+
+      input AddPersonInput {
+        personId: ID!
+        firstName: String!
+        lastName: String!
+        middleName: String
       }
 
       extend type Mutation {

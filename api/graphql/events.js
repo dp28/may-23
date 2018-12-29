@@ -15,8 +15,16 @@ module.exports = {
       comparisonType: ComparisonType!
     }
 
+    input EventInputMap {
+      ADD_PERSON: AddPersonEventInput
+    }
+
     extend type Query {
       events(filters: [Filter!]): [Event!]!
+    }
+
+    type Mutation {
+      recordEvent(event: EventInputMap): Query
     }
   `,
   resolvers: {
@@ -26,6 +34,12 @@ module.exports = {
     Query: {
       events: async (object, { filters }, context) =>
         await context.eventRepository.find({ filters })
+    },
+    Mutation: {
+      recordEvent: async (object, { event }, context) =>
+        await Promise.all(
+          Object.values(event).map(context.eventRepository.store)
+        )
     }
   }
 };

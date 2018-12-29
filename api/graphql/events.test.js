@@ -1,7 +1,8 @@
 const {
   resolvers: {
     Event: { __resolveType: resolveEventType },
-    Query
+    Query,
+    Mutation
   }
 } = require("./events");
 const { addPerson } = require("../domain/events/people");
@@ -107,5 +108,21 @@ describe("events resolver", () => {
         ).toEqual([]);
       });
     });
+  });
+});
+
+describe("recordEvent mutation resolver", () => {
+  const { getEventRepository, resolver: recordEventMutation } = withContext(
+    Mutation.recordEvent
+  );
+
+  it("should persist the event", async () => {
+    const event = addPerson({
+      firstName: "a",
+      lastName: "b",
+      personId: "fake_id"
+    });
+    await recordEventMutation({}, { event: { ADD_PERSON: event } });
+    expect(await getEventRepository().find()).toEqual([event]);
   });
 });

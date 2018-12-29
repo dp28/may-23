@@ -7,16 +7,9 @@ module.exports = {
       type Query {
         healthcheck: String!
       }
-
-      type Mutation {
-        _empty(fake: Int): Int
-      }
     `
   ],
   resolvers: {
-    Query: { healthcheck: () => "ok" },
-    Mutation: {
-      _empty: identity
-    }
+    Query: { healthcheck: () => "ok" }
   }
 };
