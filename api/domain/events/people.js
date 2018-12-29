@@ -1,3 +1,4 @@
+const { upperCaseFirst: capitalize } = require("change-case");
 const { generateId } = require("../id");
 const { validatePresenceOfAll } = require("../errors/validation");
 
@@ -29,8 +30,4 @@ function addPerson(args) {
 
 function validateAddPersonEventData(data) {
   validatePresenceOfAll(["firstName", "lastName", "personId"], data);
-}
-
-function capitalize(word) {
-  return word[0].toUpperCase() + word.substring(1);
 }

@@ -7,6 +7,7 @@ module.exports = {
       type Query {
         healthcheck: String!
       }
+
       type Mutation {
         _empty(fake: Int): Int
       }

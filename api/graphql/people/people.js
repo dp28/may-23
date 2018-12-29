@@ -20,7 +20,7 @@ module.exports = {
         middleName: String
       }
 
-      type AddPersonEvent {
+      type AddPersonEvent implements Event {
         id: ID!
         createdAt: Date!
         type: String!

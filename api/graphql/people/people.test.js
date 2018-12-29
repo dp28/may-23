@@ -1,39 +1,25 @@
 const {
-  resolvers: {
-    Mutation: { addPerson: addPersonMutation }
-  }
+  resolvers: { Mutation }
 } = require("./people");
 const { ADD_PERSON } = require("../../domain/events/people");
 const {
   itShouldThrowADuplicateIdError
 } = require("../../domain/errors/error-test-helpers");
-const {
-  buildEventRepository
-} = require("../../persistence/memory/events/events-repository");
 const { equal } = require("../../domain/filters/filters");
+const { withContext } = require("../test-utils");
 
-describe(addPersonMutation, () => {
-  let context;
-
-  beforeEach(() => {
-    context = {
-      eventRepository: buildEventRepository()
-    };
-  });
-
-  afterEach(() => {
-    context.eventRepository.removeAll();
-  });
-
+describe("addPerson mutation resolver", () => {
+  const { getEventRepository, resolver: addPersonMutation } = withContext(
+    Mutation.addPerson
+  );
   it("should persist an addPerson event", async () => {
     const filters = [equal(["type"], ADD_PERSON)];
-    expect((await context.eventRepository.find(filters)).length).toEqual(0);
+    expect((await getEventRepository().find(filters)).length).toEqual(0);
     await addPersonMutation(
       {},
-      { input: { firstName: "a", lastName: "b", personId: "fake_id" } },
-      context
+      { input: { firstName: "a", lastName: "b", personId: "fake_id" } }
     );
-    expect((await context.eventRepository.find({ filters })).length).toEqual(1);
+    expect((await getEventRepository().find({ filters })).length).toEqual(1);
   });
 
   describe("if a person has already been added with the same id", () => {
@@ -43,8 +29,7 @@ describe(addPersonMutation, () => {
       personId: "1"
     };
 
-    const addPerson = async () =>
-      await addPersonMutation({}, { input }, context);
+    const addPerson = async () => await addPersonMutation({}, { input });
 
     beforeEach(addPerson);
 
@@ -61,11 +46,10 @@ describe(addPersonMutation, () => {
       personId: "1"
     };
 
-    const addPerson = async () =>
-      await addPersonMutation({}, { input }, context);
+    const addPerson = async () => await addPersonMutation({}, { input });
 
     beforeEach(async () => {
-      await context.eventRepository.store({
+      await getEventRepository().store({
         id: "fake",
         createdAt: new Date(),
         data: { personId: input.id }
