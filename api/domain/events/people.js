@@ -1,8 +1,7 @@
 const { upperCaseFirst: capitalize } = require("change-case");
 const { generateId } = require("../id");
 const { validatePresenceOfAll } = require("../errors/validation");
-
-const ADD_PERSON = "ADD_PERSON";
+const { ADD_PERSON } = require("./types");
 
 module.exports = {
   addPerson,

@@ -1,6 +1,12 @@
 const { gql } = require("apollo-server-express");
 const { pascalCase } = require("change-case");
 
+const types = require("../domain/events/types");
+
+const typeMap = Object.values(types)
+  .map(type => `${type}: ${pascalCase(type)}EventInput`)
+  .join("\n");
+
 module.exports = {
   typeDefs: gql`
     interface Event {
@@ -16,7 +22,7 @@ module.exports = {
     }
 
     input EventInputMap {
-      ADD_PERSON: AddPersonEventInput
+      ${typeMap}
     }
 
     extend type Query {
