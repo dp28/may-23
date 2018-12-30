@@ -1,3 +1,4 @@
+const { dissocPath } = require("ramda");
 const {
   resolvers: {
     Event: { __resolveType: resolveEventType },
@@ -115,14 +116,26 @@ describe("recordEvent mutation resolver", () => {
   const { getEventRepository, resolver: recordEventMutation } = withContext(
     Mutation.recordEvent
   );
+  const event = addPerson({
+    firstName: "a",
+    lastName: "b",
+    personId: "fake_id"
+  });
 
   it("should persist the event", async () => {
-    const event = addPerson({
-      firstName: "a",
-      lastName: "b",
-      personId: "fake_id"
-    });
     await recordEventMutation({}, { event: { ADD_PERSON: event } });
     expect(await getEventRepository().find()).toEqual([event]);
+  });
+
+  describe("if the event is invalid", () => {
+    it("should throw an error", async () => {
+      const invalidEvent = dissocPath(["data", "firstName"], event);
+      try {
+        await recordEventMutation({}, { event: { ADD_PERSON: invalidEvent } });
+        fail("Should have thrown an error");
+      } catch (error) {
+        expect(error.code).toBeTruthy();
+      }
+    });
   });
 });

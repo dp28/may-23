@@ -2,6 +2,7 @@ const { gql } = require("apollo-server-express");
 const { pascalCase } = require("change-case");
 
 const types = require("../domain/events/types");
+const { validateEvent } = require("../domain/events/validator");
 
 const typeMap = Object.values(types)
   .map(type => `${type}: ${pascalCase(type)}EventInput`)
@@ -42,10 +43,13 @@ module.exports = {
         await context.eventRepository.find({ filters })
     },
     Mutation: {
-      recordEvent: async (object, { event }, context) =>
+      recordEvent: async (object, { event }, context) => {
+        const events = Object.values(event);
         await Promise.all(
-          Object.values(event).map(context.eventRepository.store)
-        )
+          events.map(event => validateEvent(event, context.eventRepository))
+        );
+        return await Promise.all(events.map(context.eventRepository.store));
+      }
     }
   }
 };
