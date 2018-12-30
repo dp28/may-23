@@ -8,14 +8,14 @@ module.exports = {
   validateEvent
 };
 
-function validateEvent(event) {
+async function validateEvent(event, eventRepository) {
   validatePresenceOfAll(["id", "createdAt", "type", "data"], event);
-  ensureDataIsValidForType(event);
+  await ensureDataIsValidForType(event, eventRepository);
 }
 
-function ensureDataIsValidForType(event) {
+async function ensureDataIsValidForType(event, eventRepository) {
   if (validatorMap[event.type]) {
-    validatorMap[event.type](event.data);
+    await validatorMap[event.type](event, eventRepository);
   }
   throw invalidParameter({ parameter: "type" });
 }

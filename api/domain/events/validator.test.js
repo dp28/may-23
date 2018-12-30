@@ -2,8 +2,12 @@ const { validateEvent } = require("./validator");
 const { addPerson } = require("./people");
 const {
   itShouldThrowAParameterMissingError,
-  itShouldThrowAnError
+  itShouldThrowAnError,
+  itShouldThrowADuplicateIdError
 } = require("../errors/error-test-helpers");
+const {
+  buildEventRepository
+} = require("../../persistence/memory/events/events-repository");
 
 describe(validateEvent, () => {
   const validEvent = addPerson({
@@ -43,6 +47,18 @@ describe(validateEvent, () => {
     itShouldThrowAParameterMissingError({
       throwError: () => validateEvent(invalidEvent),
       parameter: "firstName"
+    });
+  });
+
+  describe("if the event is invalid due to already-stored events", () => {
+    const eventRepository = buildEventRepository();
+    beforeEach(() => eventRepository.store(validEvent));
+    afterEach(eventRepository.removeAll);
+
+    itShouldThrowADuplicateIdError({
+      throwError: () =>
+        validateEvent({ ...validEvent, id: "not_duped" }, eventRepository),
+      entityName: "Person"
     });
   });
 });

@@ -1,9 +1,18 @@
+const { dissocPath, assocPath } = require("ramda");
 const {
   itShouldThrowAParameterMissingError,
-  itShouldThrowACannotBeBlankError
+  itShouldThrowACannotBeBlankError,
+  itShouldThrowADuplicateIdError
 } = require("../errors/error-test-helpers");
+const {
+  buildEventRepository
+} = require("../../persistence/memory/events/events-repository");
 
-const { addPerson, ADD_PERSON } = require("./people");
+const {
+  addPerson,
+  ADD_PERSON,
+  validatorMap: { ADD_PERSON: validateAddPersonEvent }
+} = require("./people");
 
 describe("addPerson", () => {
   const buildEvent = () =>
@@ -130,5 +139,51 @@ describe("addPerson", () => {
         personId: "fake_id"
       }).data.middleName
     ).toEqual("Marvolo");
+  });
+});
+
+describe("validation for addPerson", () => {
+  const event = addPerson({
+    personId: "fake",
+    firstName: "fake",
+    lastName: "fake"
+  });
+
+  async function validateWithout(dataParam) {
+    const invalidEvent = dissocPath(["data", dataParam], event);
+    await validateAddPersonEvent(invalidEvent, {});
+  }
+
+  async function validateWithEmpty(dataParam) {
+    const invalidEvent = assocPath(["data", dataParam], "", event);
+    await validateAddPersonEvent(invalidEvent, {});
+  }
+
+  ["firstName", "lastName", "personId"].forEach(parameter => {
+    describe(`if there is no ${parameter} passed in`, () => {
+      itShouldThrowAParameterMissingError({
+        throwError: () => validateWithout(parameter),
+        parameter
+      });
+    });
+
+    describe(`if an empty ${parameter} passed in`, () => {
+      itShouldThrowACannotBeBlankError({
+        throwError: () => validateWithEmpty(parameter),
+        parameter
+      });
+    });
+  });
+
+  describe("if a person has already been added with the same id", () => {
+    const eventRepository = buildEventRepository();
+    beforeEach(() => eventRepository.store(event));
+    afterEach(eventRepository.removeAll);
+
+    itShouldThrowADuplicateIdError({
+      throwError: () =>
+        validateAddPersonEvent({ ...event, id: "not_duped" }, eventRepository),
+      entityName: "Person"
+    });
   });
 });
