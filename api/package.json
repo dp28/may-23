@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --notify --watch",
-    "start": "nodemon index.js"
+    "reset-local-data": "rm -r local-data/tmp ; cp -r local-data/saved local-data/tmp",
+    "start": "nodemon index.js",
+    "start:saved": "DATA_DIR=saved nodemon index.js"
   },
   "keywords": [],
   "author": "",
