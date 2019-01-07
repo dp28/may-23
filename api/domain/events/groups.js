@@ -1,39 +1,21 @@
-const { generateId } = require("../id");
 const { validatePresenceOfAll } = require("../errors/validation");
 const { ADD_GROUP } = require("./types");
 const { equal } = require("../filters/filters");
 const { duplicateId } = require("../errors/validation");
+const { buildEventCreator } = require("./event-creator");
 
-module.exports = {
-  addGroup,
-  ADD_GROUP,
-  validatorMap: {
-    [ADD_GROUP]: validateAddGroupEvent
-  }
-};
+const requiredDataFields = ["name", "groupId"];
 
-function addGroup(args) {
-  validateAddGroupEventData(args);
-  const { name, groupId } = args;
-  return {
-    id: generateId(),
-    createdAt: new Date(),
-    type: ADD_GROUP,
-    data: {
-      groupId,
-      name
-    }
-  };
-}
+const addGroup = buildEventCreator({
+  type: ADD_GROUP,
+  requiredDataFields
+});
 
 async function validateAddGroupEvent(event, eventRepository) {
-  validateAddGroupEventData(event.data);
+  validatePresenceOfAll(requiredDataFields, event.data);
   await ensureGroupIdDoesNotAlreadyExist(event.data.groupId, eventRepository);
 }
 
-function validateAddGroupEventData(data) {
-  validatePresenceOfAll(["name", "groupId"], data);
-}
 async function ensureGroupIdDoesNotAlreadyExist(id, eventRepository) {
   const numberOfDupes = await eventRepository.count({
     filters: [equal(["data", "groupId"], id), equal(["type"], "ADD_GROUP")]
@@ -42,3 +24,11 @@ async function ensureGroupIdDoesNotAlreadyExist(id, eventRepository) {
     throw duplicateId({ entityName: "Group", id });
   }
 }
+
+module.exports = {
+  addGroup,
+  ADD_GROUP,
+  validatorMap: {
+    [ADD_GROUP]: validateAddGroupEvent
+  }
+};
