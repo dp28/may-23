@@ -1,4 +1,5 @@
 const { gql } = require("apollo-server-express");
+const { reducer } = require("../domain/people/people-reducer");
 
 module.exports = {
   typeDefs: [
@@ -30,7 +31,31 @@ module.exports = {
         lastName: String!
         middleName: String
       }
+
+      type Name {
+        first: String!
+        middle: String
+        last: String!
+        initials: String!
+        full: String!
+      }
+
+      type Person {
+        id: ID!
+        name: Name!
+      }
+
+      extend type Query {
+        people(filters: [Filter!]): [Person!]!
+      }
     `
   ],
-  resolvers: {}
+  resolvers: {
+    Query: {
+      people: async (object, { filters }, context) => {
+        const peopleRepository = context.buildEventBackedRepository(reducer);
+        return await peopleRepository.find({ filters });
+      }
+    }
+  }
 };

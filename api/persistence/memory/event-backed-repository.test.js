@@ -21,10 +21,7 @@ function testReducer(state = {}, event) {
 
 describe("An in-memory repository generated from an event repository and a map-based reducer", () => {
   const eventRepository = buildEventRepository();
-  const repository = buildEventBackedRepository({
-    reducer: testReducer,
-    eventRepository
-  });
+  const repository = buildEventBackedRepository(eventRepository)(testReducer);
 
   afterEach(eventRepository.removeAll);
 

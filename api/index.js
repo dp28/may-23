@@ -5,6 +5,9 @@ const path = require("path");
 const {
   buildEventRepository
 } = require("./persistence/file-system/events/events-repository");
+const {
+  buildEventBackedRepository
+} = require("./persistence/memory/event-backed-repository");
 const { typeDefs, resolvers } = require("./graphql");
 
 const dataDirectory = path.join(__dirname, "/local-data/");
@@ -13,7 +16,10 @@ const eventRepository = buildEventRepository(dataDirectory);
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: { eventRepository }
+  context: {
+    eventRepository,
+    buildEventBackedRepository: buildEventBackedRepository(eventRepository)
+  }
 });
 
 const app = express();

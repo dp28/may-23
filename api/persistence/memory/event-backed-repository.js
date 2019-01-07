@@ -1,10 +1,6 @@
 const { applyFilters } = require("./apply-filters/filters");
 
-module.exports = {
-  buildEventBackedRepository
-};
-
-function buildEventBackedRepository({ reducer, eventRepository }) {
+const buildEventBackedRepository = eventRepository => reducer => {
   async function loadState() {
     const initialState = reducer(undefined, { type: "INIT" });
     const events = await eventRepository.find();
@@ -26,4 +22,8 @@ function buildEventBackedRepository({ reducer, eventRepository }) {
     find,
     count
   };
-}
+};
+
+module.exports = {
+  buildEventBackedRepository
+};
