@@ -1,8 +1,12 @@
+const { mergeDeepRight } = require("ramda");
 const {
   validatePresenceOfAll,
   invalidParameter
 } = require("../errors/validation");
-const { validatorMap } = require("./people");
+const people = require("./people");
+const groups = require("./groups");
+
+const validatorMap = mergeDeepRight(people.validatorMap, groups.validatorMap);
 
 module.exports = {
   validateEvent

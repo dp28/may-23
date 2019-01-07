@@ -5,5 +5,6 @@ module.exports = mergeTypes([
   require("./scalars"),
   require("./comparisonType"),
   require("./events"),
-  require("./people")
+  require("./people"),
+  require("./groups")
 ]);
