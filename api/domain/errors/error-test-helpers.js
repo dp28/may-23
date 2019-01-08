@@ -4,9 +4,18 @@ module.exports = {
   itShouldThrowAnError,
   itShouldThrowAParameterMissingError,
   itShouldThrowACannotBeBlankError,
-  itShouldThrowADuplicateIdError
+  itShouldThrowADuplicateIdError,
+  expectNotToThrow
 };
 const noop = () => {};
+
+async function expectNotToThrow(possibleAsyncError) {
+  try {
+    await possibleAsyncError();
+  } catch (error) {
+    throw error;
+  }
+}
 
 function itShouldThrowAnError({
   throwError,
@@ -14,12 +23,14 @@ function itShouldThrowAnError({
   message = "",
   describeError = noop
 }) {
-  it("should throw an error", async () => {
+  it("should throw an expected error", async () => {
     try {
       await throwError();
       fail("Should have thrown an error");
     } catch (error) {
-      // pass
+      if (!error.code) {
+        throw error;
+      }
     }
   });
 

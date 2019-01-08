@@ -1,8 +1,9 @@
-const { addPerson, ADD_PERSON, validatorMap } = require("./people");
+const { addPerson, validate } = require("./people");
+const { ADD_PERSON } = require("./types");
 
 const {
   itShouldBehaveLikeAnEventCreator,
-  itShouldBehaveLikeAnEventValidatorMap
+  itShouldBehaveLikeAnEventValidator
 } = require("./test-utils");
 
 const requiredDataFields = ["firstName", "lastName", "personId"];
@@ -43,10 +44,9 @@ describe("addPerson", () => {
   });
 });
 
-describe("validation for addPerson", () => {
-  itShouldBehaveLikeAnEventValidatorMap({
-    validatorMap,
-    eventType: ADD_PERSON,
+describe("validate ADD_PERSON events", () => {
+  itShouldBehaveLikeAnEventValidator({
+    validate,
     event: addPerson(exampleInput),
     entityName: "Person",
     requiredDataFields,

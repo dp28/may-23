@@ -1,13 +1,13 @@
 const { validateEvent } = require("./validator");
-const { addPerson } = require("./people");
+const { addPerson } = require("../people");
 const {
   itShouldThrowAParameterMissingError,
   itShouldThrowAnError,
   itShouldThrowADuplicateIdError
-} = require("../errors/error-test-helpers");
+} = require("../../errors/error-test-helpers");
 const {
   buildEventRepository
-} = require("../../persistence/memory/events/events-repository");
+} = require("../../../persistence/memory/events/events-repository");
 
 describe(validateEvent, () => {
   const validEvent = addPerson({

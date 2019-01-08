@@ -1,4 +1,5 @@
-const { addGroup, ADD_GROUP, validatorMap } = require("./groups");
+const { ADD_GROUP } = require("./types");
+const { addGroup, validate } = require("./groups");
 const { testEventCreatorAndValidator } = require("./test-utils");
 
 testEventCreatorAndValidator({
@@ -10,6 +11,6 @@ testEventCreatorAndValidator({
   },
   requiredDataFields: ["name", "groupId"],
   uniqueDataFields: ["groupId"],
-  validatorMap,
+  validate,
   entityName: "Group"
 });

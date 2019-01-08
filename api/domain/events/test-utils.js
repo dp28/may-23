@@ -2,7 +2,8 @@ const { dissocPath, dissoc, assocPath, assoc } = require("ramda");
 const {
   itShouldThrowAParameterMissingError,
   itShouldThrowACannotBeBlankError,
-  itShouldThrowADuplicateIdError
+  itShouldThrowADuplicateIdError,
+  expectNotToThrow
 } = require("../errors/error-test-helpers");
 const {
   buildEventRepository
@@ -11,7 +12,7 @@ const {
 module.exports = {
   testEventCreatorAndValidator,
   itShouldBehaveLikeAnEventCreator,
-  itShouldBehaveLikeAnEventValidatorMap
+  itShouldBehaveLikeAnEventValidator
 };
 
 function itShouldBehaveLikeAnEventCreator({
@@ -81,24 +82,25 @@ function itShouldBehaveLikeAnEventCreator({
   });
 }
 
-function itShouldBehaveLikeAnEventValidatorMap({
-  validatorMap,
-  eventType,
+function itShouldBehaveLikeAnEventValidator({
+  validate,
   event,
   entityName,
   requiredDataFields = [],
   uniqueDataFields = []
 }) {
-  const validateEvent = validatorMap[eventType];
+  it("should ignore types it does not validate", async () => {
+    await expectNotToThrow(() => validate({ type: "UNKNOWN" }));
+  });
 
   async function validateWithout(dataParam) {
     const invalidEvent = dissocPath(["data", dataParam], event);
-    await validateEvent(invalidEvent, {});
+    await validate(invalidEvent, {});
   }
 
   async function validateWithEmpty(dataParam) {
     const invalidEvent = assocPath(["data", dataParam], "", event);
-    await validateEvent(invalidEvent, {});
+    await validate(invalidEvent, {});
   }
 
   requiredDataFields.forEach(parameter => {
@@ -125,7 +127,7 @@ function itShouldBehaveLikeAnEventValidatorMap({
 
       itShouldThrowADuplicateIdError({
         throwError: () =>
-          validateEvent({ ...event, id: "not_duped" }, eventRepository),
+          validate({ ...event, id: "not_duped" }, eventRepository),
         entityName
       });
     });
@@ -135,7 +137,7 @@ function itShouldBehaveLikeAnEventValidatorMap({
 function testEventCreatorAndValidator({
   eventType,
   eventCreator,
-  validatorMap,
+  validate,
   entityName,
   exampleInput,
   requiredDataFields = [],
@@ -152,10 +154,9 @@ function testEventCreatorAndValidator({
     });
   });
 
-  describe(`validatorMap for ${eventType} events`, () => {
-    itShouldBehaveLikeAnEventValidatorMap({
-      validatorMap,
-      eventType,
+  describe(`validate ${eventType} events`, () => {
+    itShouldBehaveLikeAnEventValidator({
+      validate,
       event: eventCreator(exampleInput),
       requiredDataFields,
       uniqueDataFields,

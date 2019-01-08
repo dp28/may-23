@@ -1,8 +1,8 @@
-const { validatePresenceOfAll } = require("../errors/validation");
 const { ADD_GROUP } = require("./types");
 const { equal } = require("../filters/filters");
 const { duplicateId } = require("../errors/validation");
 const { buildEventCreator } = require("./event-creator");
+const { combineValidatorsForType } = require("./validation/combine-validators");
 
 const requiredDataFields = ["name", "groupId"];
 
@@ -11,12 +11,8 @@ const addGroup = buildEventCreator({
   requiredDataFields
 });
 
-async function validateAddGroupEvent(event, eventRepository) {
-  validatePresenceOfAll(requiredDataFields, event.data);
-  await ensureGroupIdDoesNotAlreadyExist(event.data.groupId, eventRepository);
-}
-
-async function ensureGroupIdDoesNotAlreadyExist(id, eventRepository) {
+async function ensureGroupIdDoesNotAlreadyExist(event, eventRepository) {
+  const id = event.data.groupId;
   const numberOfDupes = await eventRepository.count({
     filters: [equal(["data", "groupId"], id), equal(["type"], "ADD_GROUP")]
   });
@@ -27,8 +23,9 @@ async function ensureGroupIdDoesNotAlreadyExist(id, eventRepository) {
 
 module.exports = {
   addGroup,
-  ADD_GROUP,
-  validatorMap: {
-    [ADD_GROUP]: validateAddGroupEvent
-  }
+  validate: combineValidatorsForType({
+    type: ADD_GROUP,
+    requiredDataFields,
+    validators: [ensureGroupIdDoesNotAlreadyExist]
+  })
 };

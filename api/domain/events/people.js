@@ -1,9 +1,9 @@
 const { upperCaseFirst: capitalize } = require("change-case");
-const { validatePresenceOfAll } = require("../errors/validation");
 const { ADD_PERSON } = require("./types");
 const { equal } = require("../filters/filters");
 const { duplicateId } = require("../errors/validation");
 const { buildEventCreator } = require("./event-creator");
+const { combineValidatorsForType } = require("./validation/combine-validators");
 
 const requiredDataFields = ["firstName", "lastName", "personId"];
 
@@ -18,12 +18,8 @@ const addPerson = buildEventCreator({
   }
 });
 
-async function validateAddPersonEvent(event, eventRepository) {
-  validatePresenceOfAll(requiredDataFields, event.data);
-  await ensurePersonIdDoesNotAlreadyExist(event.data.personId, eventRepository);
-}
-
-async function ensurePersonIdDoesNotAlreadyExist(id, eventRepository) {
+async function ensurePersonIdDoesNotAlreadyExist(event, eventRepository) {
+  const id = event.data.personId;
   const numberOfDupes = await eventRepository.count({
     filters: [equal(["data", "personId"], id), equal(["type"], "ADD_PERSON")]
   });
@@ -34,8 +30,9 @@ async function ensurePersonIdDoesNotAlreadyExist(id, eventRepository) {
 
 module.exports = {
   addPerson,
-  ADD_PERSON,
-  validatorMap: {
-    [ADD_PERSON]: validateAddPersonEvent
-  }
+  validate: combineValidatorsForType({
+    type: ADD_PERSON,
+    requiredDataFields,
+    validators: [ensurePersonIdDoesNotAlreadyExist]
+  })
 };

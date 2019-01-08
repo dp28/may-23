@@ -2,7 +2,7 @@ const { gql } = require("apollo-server-express");
 const { pascalCase } = require("change-case");
 
 const types = require("../domain/events/types");
-const { validateEvent } = require("../domain/events/validator");
+const { validateEvent } = require("../domain/events/validation/validator");
 
 const typeMap = Object.values(types)
   .map(type => `${type}: ${pascalCase(type)}EventInput`)
