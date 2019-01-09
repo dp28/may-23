@@ -5,11 +5,11 @@ const {
   itShouldThrowADuplicateIdError
 } = require("./errors/error-test-helpers");
 
-module.exports.itShouldBehaveLikeAnEventRepository = buildEventRepository => {
+module.exports.itShouldBehaveLikeAnEventsRepository = buildEventsRepository => {
   describe("an Event repository", () => {
     let repository;
     beforeEach(async () => {
-      repository = await buildEventRepository();
+      repository = await buildEventsRepository();
     });
 
     afterEach(async () => {

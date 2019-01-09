@@ -18,9 +18,9 @@ const addPerson = buildEventCreator({
   }
 });
 
-async function ensurePersonIdDoesNotAlreadyExist(event, eventRepository) {
+async function ensurePersonIdDoesNotAlreadyExist(event, eventsRepository) {
   const id = event.data.personId;
-  const numberOfDupes = await eventRepository.count({
+  const numberOfDupes = await eventsRepository.count({
     filters: [equal(["data", "personId"], id), equal(["type"], "ADD_PERSON")]
   });
   if (numberOfDupes > 0) {

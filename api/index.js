@@ -1,27 +1,8 @@
 const express = require("express");
-const { ApolloServer } = require("apollo-server-express");
-const path = require("path");
 
-const {
-  buildEventRepository
-} = require("./persistence/file-system/events/events-repository");
-const {
-  buildEventBackedRepository
-} = require("./persistence/memory/event-backed-repository");
-const { typeDefs, resolvers } = require("./graphql");
+const { buildGraphqlServer } = require("./graphql");
 
-const dataSubDirectory = process.env.DATA_DIR || "tmp";
-const dataDirectory = path.join(__dirname, "/local-data/", dataSubDirectory);
-const eventRepository = buildEventRepository(dataDirectory);
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: {
-    eventRepository,
-    buildEventBackedRepository: buildEventBackedRepository(eventRepository)
-  }
-});
+const server = buildGraphqlServer();
 
 const app = express();
 server.applyMiddleware({ app });

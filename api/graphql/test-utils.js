@@ -1,9 +1,4 @@
-const {
-  buildEventRepository
-} = require("../persistence/memory/events/events-repository");
-const {
-  buildEventBackedRepository
-} = require("../persistence/memory/event-backed-repository");
+const { buildContext } = require("./context");
 
 module.exports = {
   withContext
@@ -12,19 +7,15 @@ module.exports = {
 function withContext(resolver) {
   const result = {
     resolver: (object, args) => resolver(object, args, result.context),
-    getEventRepository: () => result.context.eventRepository
+    getEventsRepository: () => result.context.eventsRepository
   };
 
   beforeEach(() => {
-    const eventRepository = buildEventRepository();
-    result.context = {
-      eventRepository,
-      buildEventBackedRepository: buildEventBackedRepository(eventRepository)
-    };
+    result.context = buildContext();
   });
 
   afterEach(() => {
-    result.context.eventRepository.removeAll();
+    result.context.eventsRepository.removeAll();
   });
 
   return result;

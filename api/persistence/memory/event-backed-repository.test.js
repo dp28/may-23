@@ -1,6 +1,6 @@
 const { generateId } = require("../../domain/id");
 const { buildEventBackedRepository } = require("./event-backed-repository");
-const { buildEventRepository } = require("./events/events-repository");
+const { buildEventsRepository } = require("./events/events-repository");
 const { equal } = require("../../domain/filters/filters");
 
 function testEvent({ data = {}, type = "TEST" } = {}) {
@@ -20,10 +20,10 @@ function testReducer(state = {}, event) {
 }
 
 describe("An in-memory repository generated from an event repository and a map-based reducer", () => {
-  const eventRepository = buildEventRepository();
-  const repository = buildEventBackedRepository(eventRepository)(testReducer);
+  const eventsRepository = buildEventsRepository();
+  const repository = buildEventBackedRepository(eventsRepository)(testReducer);
 
-  afterEach(eventRepository.removeAll);
+  afterEach(eventsRepository.removeAll);
 
   describe("#find", () => {
     it("should return an empty array if no events have been added", async () => {
@@ -31,15 +31,15 @@ describe("An in-memory repository generated from an event repository and a map-b
     });
 
     it("should return an empty array if only irrelevant events have been added", async () => {
-      await eventRepository.store(testEvent({ type: "USELESS" }));
+      await eventsRepository.store(testEvent({ type: "USELESS" }));
       expect(await repository.find()).toEqual([]);
     });
 
     it("should return the listed results of the reducer if relevant events have been added", async () => {
       const event1 = testEvent();
       const event2 = testEvent();
-      await eventRepository.store(event1);
-      await eventRepository.store(event2);
+      await eventsRepository.store(event1);
+      await eventsRepository.store(event2);
       expect(await repository.find()).toEqual([event1, event2]);
     });
 
@@ -49,8 +49,8 @@ describe("An in-memory repository generated from an event repository and a map-b
       const filter = equal(["data", "x"], "2");
 
       it("should return only the results matching the filters", async () => {
-        await eventRepository.store(event1);
-        await eventRepository.store(event2);
+        await eventsRepository.store(event1);
+        await eventsRepository.store(event2);
         expect(
           await repository.find({
             filters: [filter]
@@ -66,15 +66,15 @@ describe("An in-memory repository generated from an event repository and a map-b
     });
 
     it("should return 0 if only irrelevant events have been added", async () => {
-      await eventRepository.store(testEvent({ type: "USELESS" }));
+      await eventsRepository.store(testEvent({ type: "USELESS" }));
       expect(await repository.count()).toEqual(0);
     });
 
     it("should return the number of results of the reducer if relevant events have been added", async () => {
       const event1 = testEvent();
       const event2 = testEvent();
-      await eventRepository.store(event1);
-      await eventRepository.store(event2);
+      await eventsRepository.store(event1);
+      await eventsRepository.store(event2);
       expect(await repository.count()).toEqual(2);
     });
 
@@ -84,8 +84,8 @@ describe("An in-memory repository generated from an event repository and a map-b
       const filter = equal(["data", "x"], "2");
 
       it("should return only the number of results matching the filters", async () => {
-        await eventRepository.store(event1);
-        await eventRepository.store(event2);
+        await eventsRepository.store(event1);
+        await eventsRepository.store(event2);
         expect(
           await repository.count({
             filters: [filter]

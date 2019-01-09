@@ -1,9 +1,10 @@
+const { curry } = require("ramda");
 const { applyFilters } = require("./apply-filters/filters");
 
-const buildEventBackedRepository = eventRepository => reducer => {
+const buildEventBackedRepository = curry((eventsRepository, reducer) => {
   async function loadState() {
     const initialState = reducer(undefined, { type: "INIT" });
-    const events = await eventRepository.find();
+    const events = await eventsRepository.find();
     return events.reduce(reducer, initialState);
   }
 
@@ -22,7 +23,7 @@ const buildEventBackedRepository = eventRepository => reducer => {
     find,
     count
   };
-};
+});
 
 module.exports = {
   buildEventBackedRepository

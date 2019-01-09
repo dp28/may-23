@@ -6,7 +6,7 @@ const { withContext } = require("./test-utils");
 const { equal, notEqual } = require("../domain/filters/filters");
 
 describe("groups resolver", () => {
-  const { resolver: groupsResolver, getEventRepository } = withContext(
+  const { resolver: groupsResolver, getEventsRepository } = withContext(
     Query.groups
   );
 
@@ -20,7 +20,7 @@ describe("groups resolver", () => {
       name: "Test"
     });
 
-    beforeEach(() => getEventRepository().store(event));
+    beforeEach(() => getEventsRepository().store(event));
 
     it("should return that group as the only item", async () => {
       expect(await groupsResolver({}, {})).toEqual([
@@ -43,8 +43,8 @@ describe("groups resolver", () => {
     });
 
     beforeEach(async () => {
-      await getEventRepository().store(firstEvent);
-      await getEventRepository().store(secondEvent);
+      await getEventsRepository().store(firstEvent);
+      await getEventsRepository().store(secondEvent);
     });
 
     it("should return both groups", async () => {

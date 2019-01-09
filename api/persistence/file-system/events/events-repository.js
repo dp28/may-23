@@ -6,7 +6,7 @@ const {
   duplicateId
 } = require("../../../domain/errors/validation");
 
-module.exports.buildEventRepository = directory => {
+module.exports.buildEventsRepository = directory => {
   const EventsRepositoryFilePath = path.join(directory, "events.json");
 
   async function load() {

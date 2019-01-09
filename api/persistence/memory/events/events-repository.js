@@ -4,7 +4,7 @@ const {
   duplicateId
 } = require("../../../domain/errors/validation");
 
-module.exports.buildEventRepository = () => {
+module.exports.buildEventsRepository = () => {
   return {
     store,
     count,

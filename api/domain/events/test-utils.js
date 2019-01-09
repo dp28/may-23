@@ -6,7 +6,7 @@ const {
   expectNotToThrow
 } = require("../errors/error-test-helpers");
 const {
-  buildEventRepository
+  buildEventsRepository
 } = require("../../persistence/memory/events/events-repository");
 
 module.exports = {
@@ -121,13 +121,13 @@ function itShouldBehaveLikeAnEventValidator({
 
   uniqueDataFields.forEach(uniqueField => {
     describe(`if a ${entityName} has already been added with the same ${uniqueField}`, () => {
-      const eventRepository = buildEventRepository();
-      beforeEach(() => eventRepository.store(event));
-      afterEach(eventRepository.removeAll);
+      const eventsRepository = buildEventsRepository();
+      beforeEach(() => eventsRepository.store(event));
+      afterEach(eventsRepository.removeAll);
 
       itShouldThrowADuplicateIdError({
         throwError: () =>
-          validate({ ...event, id: "not_duped" }, eventRepository),
+          validate({ ...event, id: "not_duped" }, eventsRepository),
         entityName
       });
     });

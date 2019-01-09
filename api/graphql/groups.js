@@ -1,5 +1,4 @@
 const { gql } = require("apollo-server-express");
-const { reducer } = require("../domain/groups/groups-reducer");
 
 module.exports = {
   typeDefs: [
@@ -40,10 +39,8 @@ module.exports = {
   ],
   resolvers: {
     Query: {
-      groups: async (object, { filters }, context) => {
-        const groupsRepository = context.buildEventBackedRepository(reducer);
-        return await groupsRepository.find({ filters });
-      }
+      groups: async (object, { filters }, context) =>
+        await context.groupsRepository.find({ filters })
     }
   }
 };

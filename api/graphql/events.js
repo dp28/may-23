@@ -40,15 +40,15 @@ module.exports = {
     },
     Query: {
       events: async (object, { filters }, context) =>
-        await context.eventRepository.find({ filters })
+        await context.eventsRepository.find({ filters })
     },
     Mutation: {
       recordEvent: async (object, { event }, context) => {
         const events = Object.values(event);
         await Promise.all(
-          events.map(event => validateEvent(event, context.eventRepository))
+          events.map(event => validateEvent(event, context.eventsRepository))
         );
-        return await Promise.all(events.map(context.eventRepository.store));
+        return await Promise.all(events.map(context.eventsRepository.store));
       }
     }
   }

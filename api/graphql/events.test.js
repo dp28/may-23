@@ -25,7 +25,7 @@ describe("Event.__resolveType", () => {
 });
 
 describe("events resolver", () => {
-  const { resolver: eventResolver, getEventRepository } = withContext(
+  const { resolver: eventResolver, getEventsRepository } = withContext(
     Query.events
   );
 
@@ -40,7 +40,7 @@ describe("events resolver", () => {
       lastName: "Tester"
     });
 
-    beforeEach(() => getEventRepository().store(event));
+    beforeEach(() => getEventsRepository().store(event));
 
     it("should return that event as the only item", async () => {
       expect(await eventResolver({}, {})).toEqual([event]);
@@ -60,8 +60,8 @@ describe("events resolver", () => {
     });
 
     beforeEach(async () => {
-      await getEventRepository().store(firstEvent);
-      await getEventRepository().store(secondEvent);
+      await getEventsRepository().store(firstEvent);
+      await getEventsRepository().store(secondEvent);
     });
 
     it("should return both events", async () => {
@@ -113,7 +113,7 @@ describe("events resolver", () => {
 });
 
 describe("recordEvent mutation resolver", () => {
-  const { getEventRepository, resolver: recordEventMutation } = withContext(
+  const { getEventsRepository, resolver: recordEventMutation } = withContext(
     Mutation.recordEvent
   );
   const event = addPerson({
@@ -124,7 +124,7 @@ describe("recordEvent mutation resolver", () => {
 
   it("should persist the event", async () => {
     await recordEventMutation({}, { event: { ADD_PERSON: event } });
-    expect(await getEventRepository().find()).toEqual([event]);
+    expect(await getEventsRepository().find()).toEqual([event]);
   });
 
   describe("if the event is invalid", () => {

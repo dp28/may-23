@@ -6,7 +6,7 @@ const { withContext } = require("./test-utils");
 const { equal } = require("../domain/filters/filters");
 
 describe("people resolver", () => {
-  const { resolver: peopleResolver, getEventRepository } = withContext(
+  const { resolver: peopleResolver, getEventsRepository } = withContext(
     Query.people
   );
 
@@ -21,7 +21,7 @@ describe("people resolver", () => {
       lastName: "Tester"
     });
 
-    beforeEach(() => getEventRepository().store(event));
+    beforeEach(() => getEventsRepository().store(event));
 
     it("should return that person as the only item", async () => {
       expect(await peopleResolver({}, {})).toEqual([
@@ -52,8 +52,8 @@ describe("people resolver", () => {
     });
 
     beforeEach(async () => {
-      await getEventRepository().store(firstEvent);
-      await getEventRepository().store(secondEvent);
+      await getEventsRepository().store(firstEvent);
+      await getEventsRepository().store(secondEvent);
     });
 
     it("should return both people", async () => {

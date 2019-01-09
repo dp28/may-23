@@ -1,6 +1,8 @@
+const { ApolloServer } = require("apollo-server-express");
 const { mergeTypes } = require("./utils");
+const { buildFileSystemBackedContext } = require("./context");
 
-module.exports = mergeTypes([
+const { typeDefs, resolvers } = mergeTypes([
   require("./root"),
   require("./scalars"),
   require("./comparisonType"),
@@ -8,3 +10,12 @@ module.exports = mergeTypes([
   require("./people"),
   require("./groups")
 ]);
+
+module.exports = {
+  buildGraphqlServer: () =>
+    new ApolloServer({
+      typeDefs,
+      resolvers,
+      context: buildFileSystemBackedContext()
+    })
+};

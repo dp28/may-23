@@ -11,9 +11,9 @@ const addGroup = buildEventCreator({
   requiredDataFields
 });
 
-async function ensureGroupIdDoesNotAlreadyExist(event, eventRepository) {
+async function ensureGroupIdDoesNotAlreadyExist(event, eventsRepository) {
   const id = event.data.groupId;
-  const numberOfDupes = await eventRepository.count({
+  const numberOfDupes = await eventsRepository.count({
     filters: [equal(["data", "groupId"], id), equal(["type"], "ADD_GROUP")]
   });
   if (numberOfDupes > 0) {
