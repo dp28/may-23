@@ -1,6 +1,6 @@
 const { reducer } = require("./groups-reducer");
 const { onInit, reduceFromInitialState } = require("../test-utils");
-const { addGroup } = require("../events/groups");
+const { addGroup, addPersonToGroup } = require("../events/groups");
 
 describe("groups reducer", () => {
   onInit(reducer, result => {
@@ -36,6 +36,10 @@ describe("groups reducer", () => {
       it("should have the passed-in name", () => {
         expect(group.name).toEqual("chums");
       });
+
+      it("should have an empty array of people ids", () => {
+        expect(group.peopleIds).toEqual([]);
+      });
     });
 
     describe("if another group is added", () => {
@@ -62,6 +66,28 @@ describe("groups reducer", () => {
           expect(noMoreGroups).toEqual(groups);
         });
       });
+    });
+  });
+
+  describe("when a person is added to a group", () => {
+    const personId = "blabla";
+    const groupId = "groupblabla";
+    const event = addPersonToGroup({
+      personId,
+      groupId
+    });
+
+    const groups = reduceFromInitialState(
+      reducer,
+      addGroup({
+        name: "chums",
+        groupId
+      })
+    );
+
+    it("should add the personId to the array of peopleIds", () => {
+      const group = reducer(groups, event)[groupId];
+      expect(group.peopleIds).toEqual([personId]);
     });
   });
 });

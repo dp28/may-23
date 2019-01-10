@@ -26,7 +26,8 @@ describe("groups resolver", () => {
       expect(await groupsResolver({}, {})).toEqual([
         {
           id: "fake",
-          name: "Test"
+          name: "Test",
+          peopleIds: []
         }
       ]);
     });

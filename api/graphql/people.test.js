@@ -27,6 +27,7 @@ describe("people resolver", () => {
       expect(await peopleResolver({}, {})).toEqual([
         {
           id: "fake",
+          groupIds: [],
           name: {
             first: "Test",
             middle: null,
