@@ -3,7 +3,8 @@ const {
   VALIDATION,
   CANNOT_BE_BLANK,
   DUPLICATE_ID,
-  INVALID_PARAMETER
+  INVALID_PARAMETER,
+  NOT_FOUND
 } = require("./codes");
 const { buildError } = require("./error");
 
@@ -13,6 +14,7 @@ module.exports = {
   validatePresenceOf,
   validatePresenceOfAll,
   duplicateId,
+  notFound,
   invalidParameter
 };
 
@@ -67,6 +69,15 @@ function duplicateId({ entityName, id }) {
     message: `'${entityName}' already exists with id '${id}'`,
     code: DUPLICATE_ID,
     duplicateId: id,
+    entityName
+  });
+}
+
+function notFound({ entityName, id }) {
+  return buildError({
+    message: `'${entityName}' not found with id '${id}'`,
+    code: NOT_FOUND,
+    id,
     entityName
   });
 }

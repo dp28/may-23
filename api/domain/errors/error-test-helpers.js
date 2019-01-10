@@ -1,10 +1,16 @@
-const { PARAMETER_MISSING, CANNOT_BE_BLANK, DUPLICATE_ID } = require("./codes");
+const {
+  PARAMETER_MISSING,
+  CANNOT_BE_BLANK,
+  DUPLICATE_ID,
+  NOT_FOUND
+} = require("./codes");
 
 module.exports = {
   itShouldThrowAnError,
   itShouldThrowAParameterMissingError,
   itShouldThrowACannotBeBlankError,
   itShouldThrowADuplicateIdError,
+  itShouldThrowANotFoundError,
   expectNotToThrow
 };
 const noop = () => {};
@@ -114,6 +120,32 @@ function itShouldThrowADuplicateIdError({
       it(`should have a duplicateId property`, async () => {
         const error = await buildError();
         expect(error.duplicateId).toBeTruthy();
+      });
+    }
+  });
+}
+
+function itShouldThrowANotFoundError({
+  throwError,
+  entityName,
+  message,
+  describeError = noop
+}) {
+  itShouldThrowAnError({
+    throwError,
+    code: NOT_FOUND,
+    message: message || new RegExp(`${entityName}.* not found with id`),
+    describeError: buildError => {
+      describeError(buildError);
+
+      it(`should have an entityName property with the value '${entityName}'`, async () => {
+        const error = await buildError();
+        expect(error.entityName).toEqual(entityName);
+      });
+
+      it(`should have an id property`, async () => {
+        const error = await buildError();
+        expect(error.id).toBeTruthy();
       });
     }
   });

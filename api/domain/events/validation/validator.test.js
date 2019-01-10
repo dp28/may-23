@@ -5,9 +5,7 @@ const {
   itShouldThrowAnError,
   itShouldThrowADuplicateIdError
 } = require("../../errors/error-test-helpers");
-const {
-  buildRepositories
-} = require("../../../persistence/memory/repositories");
+const { buildRepositoriesAndClearUp } = require("../test-utils");
 
 describe(validateEvent, () => {
   const validEvent = addPerson({
@@ -51,7 +49,7 @@ describe(validateEvent, () => {
   });
 
   describe("if the event is invalid due to already-stored events", () => {
-    const repositories = buildRepositories();
+    const repositories = buildRepositoriesAndClearUp();
     beforeEach(() => repositories.eventsRepository.store(validEvent));
     afterEach(repositories.eventsRepository.removeAll);
 

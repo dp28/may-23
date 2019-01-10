@@ -11,8 +11,15 @@ module.exports = {
   testEventCreatorAndValidator,
   itShouldBehaveLikeAnEventCreator,
   itShouldBehaveLikeAnEventValidator,
-  itShouldRequireUniqueness
+  itShouldRequireUniqueness,
+  buildRepositoriesAndClearUp
 };
+
+function buildRepositoriesAndClearUp() {
+  const repositories = buildRepositories();
+  afterEach(() => repositories.eventsRepository.removeAll());
+  return repositories;
+}
 
 function itShouldBehaveLikeAnEventCreator({
   eventCreator,

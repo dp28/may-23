@@ -14,6 +14,15 @@ const buildEventBackedRepository = curry((eventsRepository, reducer) => {
     return applyFilters({ filters }, values);
   }
 
+  async function findById(id) {
+    const mappedById = await loadState();
+    return mappedById[id] || null;
+  }
+
+  async function exists(id) {
+    return await findById(id).then(Boolean);
+  }
+
   async function count({ filters } = {}) {
     const results = await find({ filters });
     return results.length;
@@ -21,6 +30,8 @@ const buildEventBackedRepository = curry((eventsRepository, reducer) => {
 
   return {
     find,
+    findById,
+    exists,
     count
   };
 });

@@ -32,6 +32,30 @@ module.exports = {
         name: String!
       }
 
+      type AddPersonToGroupEvent implements Event {
+        id: ID!
+        createdAt: Date!
+        type: String!
+        data: AddPersonToGroupData
+      }
+
+      type AddPersonToGroupData {
+        personId: ID!
+        groupId: ID!
+      }
+
+      input AddPersonToGroupEventInput {
+        id: ID!
+        createdAt: Date!
+        type: String!
+        data: AddPersonToGroupInput
+      }
+
+      input AddPersonToGroupInput {
+        personId: ID!
+        groupId: ID!
+      }
+
       extend type Query {
         groups(filters: [Filter!]): [Group!]!
       }
