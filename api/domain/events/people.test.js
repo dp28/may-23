@@ -3,7 +3,8 @@ const { ADD_PERSON } = require("./types");
 
 const {
   itShouldBehaveLikeAnEventCreator,
-  itShouldBehaveLikeAnEventValidator
+  itShouldBehaveLikeAnEventValidator,
+  itShouldRequireUniqueness
 } = require("./test-utils");
 
 const requiredDataFields = ["firstName", "lastName", "personId"];
@@ -48,8 +49,13 @@ describe("validate ADD_PERSON events", () => {
   itShouldBehaveLikeAnEventValidator({
     validate,
     event: addPerson(exampleInput),
+    requiredDataFields
+  });
+
+  itShouldRequireUniqueness({
+    validate,
+    event: addPerson(exampleInput),
     entityName: "Person",
-    requiredDataFields,
-    uniqueDataFields: ["personId"]
+    uniqueField: "personId"
   });
 });

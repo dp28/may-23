@@ -45,9 +45,7 @@ module.exports = {
     Mutation: {
       recordEvent: async (object, { event }, context) => {
         const events = Object.values(event);
-        await Promise.all(
-          events.map(event => validateEvent(event, context.eventsRepository))
-        );
+        await Promise.all(events.map(event => validateEvent(event, context)));
         return await Promise.all(events.map(context.eventsRepository.store));
       }
     }

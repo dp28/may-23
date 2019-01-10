@@ -1,6 +1,6 @@
-const { ADD_GROUP } = require("./types");
-const { addGroup, validate } = require("./groups");
-const { testEventCreatorAndValidator } = require("./test-utils");
+const { ADD_GROUP } = require("../types");
+const { addGroup, validate } = require("./add-group");
+const { testEventCreatorAndValidator } = require("../test-utils");
 
 testEventCreatorAndValidator({
   eventType: ADD_GROUP,

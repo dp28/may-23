@@ -6,8 +6,8 @@ const {
   itShouldThrowADuplicateIdError
 } = require("../../errors/error-test-helpers");
 const {
-  buildEventsRepository
-} = require("../../../persistence/memory/events/events-repository");
+  buildRepositories
+} = require("../../../persistence/memory/repositories");
 
 describe(validateEvent, () => {
   const validEvent = addPerson({
@@ -51,13 +51,13 @@ describe(validateEvent, () => {
   });
 
   describe("if the event is invalid due to already-stored events", () => {
-    const eventsRepository = buildEventsRepository();
-    beforeEach(() => eventsRepository.store(validEvent));
-    afterEach(eventsRepository.removeAll);
+    const repositories = buildRepositories();
+    beforeEach(() => repositories.eventsRepository.store(validEvent));
+    afterEach(repositories.eventsRepository.removeAll);
 
     itShouldThrowADuplicateIdError({
       throwError: () =>
-        validateEvent({ ...validEvent, id: "not_duped" }, eventsRepository),
+        validateEvent({ ...validEvent, id: "not_duped" }, repositories),
       entityName: "Person"
     });
   });

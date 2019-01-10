@@ -5,14 +5,13 @@ const {
   itShouldThrowADuplicateIdError,
   expectNotToThrow
 } = require("../errors/error-test-helpers");
-const {
-  buildEventsRepository
-} = require("../../persistence/memory/events/events-repository");
+const { buildRepositories } = require("../../persistence/memory/repositories");
 
 module.exports = {
   testEventCreatorAndValidator,
   itShouldBehaveLikeAnEventCreator,
-  itShouldBehaveLikeAnEventValidator
+  itShouldBehaveLikeAnEventValidator,
+  itShouldRequireUniqueness
 };
 
 function itShouldBehaveLikeAnEventCreator({
@@ -85,22 +84,23 @@ function itShouldBehaveLikeAnEventCreator({
 function itShouldBehaveLikeAnEventValidator({
   validate,
   event,
-  entityName,
-  requiredDataFields = [],
-  uniqueDataFields = []
+  requiredDataFields = []
 }) {
+  const repositories = buildRepositories();
+  afterEach(repositories.eventsRepository.removeAll);
+
   it("should ignore types it does not validate", async () => {
     await expectNotToThrow(() => validate({ type: "UNKNOWN" }));
   });
 
   async function validateWithout(dataParam) {
     const invalidEvent = dissocPath(["data", dataParam], event);
-    await validate(invalidEvent, {});
+    await validate(invalidEvent, {}, repositories);
   }
 
   async function validateWithEmpty(dataParam) {
     const invalidEvent = assocPath(["data", dataParam], "", event);
-    await validate(invalidEvent, {});
+    await validate(invalidEvent, {}, repositories);
   }
 
   requiredDataFields.forEach(parameter => {
@@ -118,18 +118,22 @@ function itShouldBehaveLikeAnEventValidator({
       });
     });
   });
+}
 
-  uniqueDataFields.forEach(uniqueField => {
-    describe(`if a ${entityName} has already been added with the same ${uniqueField}`, () => {
-      const eventsRepository = buildEventsRepository();
-      beforeEach(() => eventsRepository.store(event));
-      afterEach(eventsRepository.removeAll);
+function itShouldRequireUniqueness({
+  validate,
+  entityName,
+  uniqueField,
+  event
+}) {
+  describe(`if a ${entityName} has already been added with the same ${uniqueField}`, () => {
+    const repositories = buildRepositories();
+    beforeEach(() => repositories.eventsRepository.store(event));
+    afterEach(repositories.eventsRepository.removeAll);
 
-      itShouldThrowADuplicateIdError({
-        throwError: () =>
-          validate({ ...event, id: "not_duped" }, eventsRepository),
-        entityName
-      });
+    itShouldThrowADuplicateIdError({
+      throwError: () => validate({ ...event, id: "not_duped" }, repositories),
+      entityName
     });
   });
 }
@@ -161,6 +165,15 @@ function testEventCreatorAndValidator({
       requiredDataFields,
       uniqueDataFields,
       entityName
+    });
+
+    uniqueDataFields.forEach(uniqueField => {
+      itShouldRequireUniqueness({
+        event: eventCreator(exampleInput),
+        validate,
+        entityName,
+        uniqueField
+      });
     });
   });
 }
