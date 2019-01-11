@@ -1,4 +1,8 @@
-const { EQUAL, NOT_EQUAL } = require("../../../domain/filters/filters");
+const {
+  EQUAL,
+  NOT_EQUAL,
+  CONTAINED_IN
+} = require("../../../domain/filters/filters");
 
 module.exports = {
   matchesInMemory,
@@ -30,6 +34,8 @@ function matchesValue(filter, value) {
       return filter.value === value;
     case NOT_EQUAL:
       return filter.value !== value;
+    case CONTAINED_IN:
+      return filter.value.includes(value);
     default:
       throw new Error(`Unknown comparisonType "${filter.comparisonType}"`);
   }

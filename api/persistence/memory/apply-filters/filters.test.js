@@ -1,8 +1,10 @@
 const {
   equal,
   notEqual,
+  containedIn,
   EQUAL,
-  NOT_EQUAL
+  NOT_EQUAL,
+  CONTAINED_IN
 } = require("../../../domain/filters/filters");
 const { matchesInMemory } = require("./filters");
 
@@ -50,6 +52,20 @@ describe(matchesInMemory, () => {
 
     it("should return false if the value of the property strictly equals the value of the filter", () => {
       const filter = notEqual(["test"], 1);
+      expect(matchesInMemory([filter], { test: 1 })).toBeFalsy();
+    });
+  });
+
+  describe(`with a '${CONTAINED_IN}' filter`, () => {
+    itShouldBehaveLikeMatchingByAFilter({ containedIn });
+
+    it("should return true if the value of the property exists in the array value of the filter", () => {
+      const filter = containedIn(["test"], [1, 2, 3]);
+      expect(matchesInMemory([filter], { test: 1 })).toBeTruthy();
+    });
+
+    it("should return false if the value of the property does not exist in the array value of the filter", () => {
+      const filter = containedIn(["test"], [2, 3, 4]);
       expect(matchesInMemory([filter], { test: 1 })).toBeFalsy();
     });
   });

@@ -1,4 +1,11 @@
-const { equal, notEqual, EQUAL, NOT_EQUAL } = require("./filters");
+const {
+  equal,
+  notEqual,
+  EQUAL,
+  NOT_EQUAL,
+  CONTAINED_IN,
+  containedIn
+} = require("./filters");
 
 const path = ["some", 0, "possible", "path"];
 const value = 1;
@@ -23,3 +30,4 @@ function itShouldBehaveLikeAFilter(comparisonType, namedFilter) {
 
 itShouldBehaveLikeAFilter(EQUAL, { equal });
 itShouldBehaveLikeAFilter(NOT_EQUAL, { notEqual });
+itShouldBehaveLikeAFilter(CONTAINED_IN, { containedIn });
