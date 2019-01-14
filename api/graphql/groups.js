@@ -1,4 +1,5 @@
 const { gql } = require("apollo-server-express");
+const { containedIn } = require("../domain/filters/filters");
 
 module.exports = {
   typeDefs: [
@@ -30,6 +31,7 @@ module.exports = {
       type Group {
         id: ID!
         name: String!
+        people(filters: [Filter!]): [Person!]!
       }
 
       type AddPersonToGroupEvent implements Event {
@@ -65,6 +67,14 @@ module.exports = {
     Query: {
       groups: async (object, { filters }, context) =>
         await context.groupsRepository.find({ filters })
+    },
+    Group: {
+      people: async (group, { filters = [] }, context) => {
+        const inIds = containedIn(["id"], group.peopleIds);
+        return await context.peopleRepository.find({
+          filters: [...filters, inIds]
+        });
+      }
     }
   }
 };

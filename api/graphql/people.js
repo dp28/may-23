@@ -43,7 +43,7 @@ module.exports = {
       type Person {
         id: ID!
         name: Name!
-        groups: [Group!]!
+        groups(filters: [Filter!]): [Group!]!
       }
 
       extend type Query {

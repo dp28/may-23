@@ -1,7 +1,8 @@
 const {
-  resolvers: { Query }
+  resolvers: { Query, Group }
 } = require("./groups");
-const { addGroup } = require("../domain/events/groups");
+const { addGroup, addPersonToGroup } = require("../domain/events/groups");
+const { addPerson } = require("../domain/events/people");
 const { withContext } = require("./test-utils");
 const { equal, notEqual } = require("../domain/filters/filters");
 
@@ -90,6 +91,68 @@ describe("groups resolver", () => {
             }
           )
         ).toEqual([]);
+      });
+    });
+  });
+});
+
+describe("Group resolvers", () => {
+  describe(".people", () => {
+    const { resolver: peopleResolver, getEventsRepository } = withContext(
+      Group.people
+    );
+
+    it("should return an empty array if there are no people for the person", async () => {
+      const people = await peopleResolver({ peopleIds: [] }, {});
+      expect(people).toEqual([]);
+    });
+
+    describe("if the group contains a person", () => {
+      const addPersonEvent = addPerson({
+        personId: "fake",
+        firstName: "A",
+        lastName: "B"
+      });
+      const addOtherPersonEvent = addPerson({
+        personId: "fake2",
+        firstName: "A",
+        lastName: "B"
+      });
+      const addGroupEvent = addGroup({ groupId: "fake", name: "A" });
+      const addPersonToGroupEvent = addPersonToGroup({
+        groupId: "fake",
+        personId: "fake"
+      });
+      const addOtherPersonToGroupEvent = addPersonToGroup({
+        groupId: "fake",
+        personId: "fake2"
+      });
+
+      beforeEach(
+        async () =>
+          await Promise.all(
+            [
+              addPersonEvent,
+              addOtherPersonEvent,
+              addGroupEvent,
+              addPersonToGroupEvent,
+              addOtherPersonToGroupEvent
+            ].map(getEventsRepository().store)
+          )
+      );
+
+      it("should return the people in the group", async () => {
+        const people = await peopleResolver({ peopleIds: ["fake"] }, {});
+        expect(people.map(_ => _.id)).toEqual(["fake"]);
+      });
+
+      it("should not return any people if they are filtered out", async () => {
+        const filters = [notEqual(["id"], "fake")];
+        const people = await peopleResolver(
+          { peopleIds: ["fake"] },
+          { filters }
+        );
+        expect(people).toEqual([]);
       });
     });
   });
