@@ -2,11 +2,13 @@ const {
   PARAMETER_MISSING,
   CANNOT_BE_BLANK,
   DUPLICATE_ID,
-  NOT_FOUND
+  NOT_FOUND,
+  INVALID_PARAMETER
 } = require("./codes");
 
 module.exports = {
   itShouldThrowAnError,
+  itShouldThrowAnInvalidParameterError,
   itShouldThrowAParameterMissingError,
   itShouldThrowACannotBeBlankError,
   itShouldThrowADuplicateIdError,
@@ -54,6 +56,27 @@ function itShouldThrowAnError({
     });
 
     describeError(buildError);
+  });
+}
+
+function itShouldThrowAnInvalidParameterError({
+  throwError,
+  parameter,
+  reason,
+  describeError = noop
+}) {
+  itShouldThrowAnError({
+    throwError,
+    code: INVALID_PARAMETER,
+    message: new RegExp(`invalid .*${parameter}.+${reason}`),
+    describeError: buildError => {
+      describeError(buildError);
+
+      it(`should have a parameter property with the value '${parameter}'`, async () => {
+        const error = await buildError();
+        expect(error.parameter).toEqual(parameter);
+      });
+    }
   });
 }
 
