@@ -1,5 +1,7 @@
 module.exports = {
-  itShouldThrowAnError,
+  itShouldThrowAnError: buildThrowMatcher(itShouldBeAnError),
+  itShouldBeAnError,
+  buildThrowMatcher,
   expectNotToThrow
 };
 
@@ -11,44 +13,50 @@ async function expectNotToThrow(possibleAsyncError) {
   }
 }
 
-function itShouldThrowAnError({
-  throwError,
+function itShouldBeAnError({
+  error,
   code,
   message = "",
   describeError = () => {}
 }) {
-  it("should throw an expected error", async () => {
-    try {
-      await throwError();
-      fail("Should have thrown an error");
-    } catch (error) {
-      if (!error.code) {
-        throw error;
-      }
-    }
-  });
-
-  describe("the thrown error", () => {
-    const buildError = async () => await getError(throwError);
+  describe("the error", () => {
+    const buildError = async () =>
+      typeof error === "function" ? await getError(error) : error;
 
     it(`should have the code '${code}'`, async () => {
-      const error = await buildError();
-      expect(error.code).toEqual(code);
+      const resolvedError = await buildError();
+      expect(resolvedError.code).toEqual(code);
     });
 
     it(`should have a message`, async () => {
-      const error = await buildError();
-      expect(error.message).toMatch(message);
+      const resolvedError = await buildError();
+      expect(resolvedError.message).toMatch(message);
     });
 
     describeError(buildError);
   });
 }
 
-async function getError(throwError) {
+function buildThrowMatcher(errorMatcher) {
+  return ({ throwError, ...args }) => {
+    it("should throw an expected error", async () => {
+      try {
+        await throwError();
+        fail("Should have thrown an error");
+      } catch (error) {
+        if (!error.code) {
+          throw error;
+        }
+      }
+    });
+
+    errorMatcher({ ...args, error: throwError });
+  };
+}
+
+async function getError(throwOrReturnError) {
   try {
-    await throwError();
-    return null;
+    return await throwOrReturnError();
   } catch (error) {
     return error;
   }

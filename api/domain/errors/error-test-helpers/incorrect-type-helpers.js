@@ -1,31 +1,34 @@
 const { INCORRECT_TYPE } = require("../codes");
-const { itShouldThrowAnError } = require("./base-helpers");
+const { itShouldBeAnError, buildThrowMatcher } = require("./base-helpers");
 
 module.exports = {
-  itShouldThrowAnIncorrectTypeError
+  itShouldThrowAnIncorrectTypeError: buildThrowMatcher(
+    itShouldBeAnIncorrectTypeError
+  ),
+  itShouldBeAnIncorrectTypeError
 };
 
-function itShouldThrowAnIncorrectTypeError({
-  throwError,
+function itShouldBeAnIncorrectTypeError({
+  error,
   parameter,
   expected,
   describeError = () => {}
 }) {
-  itShouldThrowAnError({
-    throwError,
+  itShouldBeAnError({
+    error,
     code: INCORRECT_TYPE,
     message: new RegExp(`incorrect .*${parameter}.+${expected}`),
     describeError: buildError => {
       describeError(buildError);
 
       it(`should have a parameter property with the value '${parameter}'`, async () => {
-        const error = await buildError();
-        expect(error.parameter).toEqual(parameter);
+        const resolvedError = await buildError();
+        expect(resolvedError.parameter).toEqual(parameter);
       });
 
       it(`should have an expected property with the value '${expected}'`, async () => {
-        const error = await buildError();
-        expect(error.expected).toEqual(expected);
+        const resolvedError = await buildError();
+        expect(resolvedError.expected).toEqual(expected);
       });
     }
   });

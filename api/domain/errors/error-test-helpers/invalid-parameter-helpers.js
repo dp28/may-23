@@ -1,26 +1,29 @@
 const { INVALID_PARAMETER } = require("../codes");
-const { itShouldThrowAnError } = require("./base-helpers");
+const { itShouldBeAnError, buildThrowMatcher } = require("./base-helpers");
 
 module.exports = {
-  itShouldThrowAnInvalidParameterError
+  itShouldThrowAnInvalidParameterError: buildThrowMatcher(
+    itShouldBeAnInvalidParameterError
+  ),
+  itShouldBeAnInvalidParameterError
 };
 
-function itShouldThrowAnInvalidParameterError({
-  throwError,
+function itShouldBeAnInvalidParameterError({
+  error,
   parameter,
   reason,
   describeError = () => {}
 }) {
-  itShouldThrowAnError({
-    throwError,
+  itShouldBeAnError({
+    error,
     code: INVALID_PARAMETER,
     message: new RegExp(`invalid .*${parameter}.+${reason}`),
     describeError: buildError => {
       describeError(buildError);
 
       it(`should have a parameter property with the value '${parameter}'`, async () => {
-        const error = await buildError();
-        expect(error.parameter).toEqual(parameter);
+        const resolvedError = await buildError();
+        expect(resolvedError.parameter).toEqual(parameter);
       });
     }
   });
