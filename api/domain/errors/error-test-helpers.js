@@ -3,12 +3,14 @@ const {
   CANNOT_BE_BLANK,
   DUPLICATE_ID,
   NOT_FOUND,
-  INVALID_PARAMETER
+  INVALID_PARAMETER,
+  INCORRECT_TYPE
 } = require("./codes");
 
 module.exports = {
   itShouldThrowAnError,
   itShouldThrowAnInvalidParameterError,
+  itShouldThrowAnIncorrectTypeError,
   itShouldThrowAParameterMissingError,
   itShouldThrowACannotBeBlankError,
   itShouldThrowADuplicateIdError,
@@ -75,6 +77,32 @@ function itShouldThrowAnInvalidParameterError({
       it(`should have a parameter property with the value '${parameter}'`, async () => {
         const error = await buildError();
         expect(error.parameter).toEqual(parameter);
+      });
+    }
+  });
+}
+
+function itShouldThrowAnIncorrectTypeError({
+  throwError,
+  parameter,
+  expected,
+  describeError = noop
+}) {
+  itShouldThrowAnError({
+    throwError,
+    code: INCORRECT_TYPE,
+    message: new RegExp(`incorrect .*${parameter}.+${expected}`),
+    describeError: buildError => {
+      describeError(buildError);
+
+      it(`should have a parameter property with the value '${parameter}'`, async () => {
+        const error = await buildError();
+        expect(error.parameter).toEqual(parameter);
+      });
+
+      it(`should have an expected property with the value '${expected}'`, async () => {
+        const error = await buildError();
+        expect(error.expected).toEqual(expected);
       });
     }
   });

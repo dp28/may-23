@@ -4,7 +4,8 @@ const {
   CANNOT_BE_BLANK,
   DUPLICATE_ID,
   INVALID_PARAMETER,
-  NOT_FOUND
+  NOT_FOUND,
+  INCORRECT_TYPE
 } = require("./codes");
 const { buildError } = require("./error");
 
@@ -15,7 +16,8 @@ module.exports = {
   validatePresenceOfAll,
   duplicateId,
   notFound,
-  invalidParameter
+  invalidParameter,
+  incorrectType
 };
 
 function validatePresenceOfAll(parameters, object) {
@@ -53,6 +55,15 @@ function invalidParameter({ reason, parameter }) {
     message: `invalid value for '${parameter}' parameter${suffix}`,
     code: INVALID_PARAMETER,
     parameter
+  });
+}
+
+function incorrectType({ expected, parameter }) {
+  return buildError({
+    message: `incorrect value for '${parameter}' parameter, expected ${expected}`,
+    code: INCORRECT_TYPE,
+    parameter,
+    expected
   });
 }
 
