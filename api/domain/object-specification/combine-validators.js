@@ -10,7 +10,7 @@ function combineValidators(validators, { sequentially = false } = {}) {
   const apply = sequentially ? applySequentially : applyInParallel;
   return (input, context) => {
     const { errors, isAsync } = apply(validators, input, context);
-    return isAsync ? mergeAsync(errors) : mergeSync(errors);
+    return isAsync ? mergeAsync(errors) : mergeErrors(errors);
   };
 }
 
@@ -50,12 +50,8 @@ function buildEmptyValidationResult() {
   return addValidationResult();
 }
 
-function mergeSync(errors) {
-  return errors.length ? mergeErrors(errors) : null;
-}
-
 function mergeAsync(errors) {
   return Promise.all(errors)
     .then(resolvedErrors => resolvedErrors.filter(isNotNullAndUndefined))
-    .then(mergeSync);
+    .then(mergeErrors);
 }

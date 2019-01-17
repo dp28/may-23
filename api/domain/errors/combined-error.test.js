@@ -25,12 +25,8 @@ describe(combinedError, () => {
 
 describe(mergeErrors, () => {
   describe("with no errors", () => {
-    it(`should return a ${COMBINED} error`, () => {
-      expect(mergeErrors([]).code).toBe(COMBINED);
-    });
-
-    it(`should have no errors`, () => {
-      expect(mergeErrors([]).errors.length).toBe(0);
+    it(`should be null`, () => {
+      expect(mergeErrors([])).toBe(null);
     });
   });
 
@@ -38,6 +34,12 @@ describe(mergeErrors, () => {
     it("should return that error", () => {
       const error = invalidParameter({ parameter: "fake" });
       expect(mergeErrors([error])).toBe(error);
+    });
+
+    describe("which is falsy", () => {
+      it("should return null", () => {
+        expect(mergeErrors([false])).toEqual(null);
+      });
     });
   });
 
@@ -56,6 +58,12 @@ describe(mergeErrors, () => {
 
     it(`should have the errors as its 'errors' property`, () => {
       expect(merged.errors).toEqual(errors);
+    });
+
+    describe("one of which is falsy", () => {
+      it("should return just the truthy one", () => {
+        expect(mergeErrors([false, errors[0]])).toEqual(errors[0]);
+      });
     });
   });
 

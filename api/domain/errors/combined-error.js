@@ -14,7 +14,11 @@ function combinedError(errors) {
   });
 }
 
-function mergeErrors(errors) {
+function mergeErrors(possibleErrors) {
+  const errors = possibleErrors.filter(Boolean);
+  if (!errors.length) {
+    return null;
+  }
   if (errors.length === 1) {
     return errors[0];
   }
