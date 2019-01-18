@@ -5,7 +5,8 @@ const {
   DUPLICATE_ID,
   INVALID_PARAMETER,
   NOT_FOUND,
-  INCORRECT_TYPE
+  INCORRECT_TYPE,
+  REQUIRED_PROPERTY
 } = require("./codes");
 const { buildError } = require("./error");
 
@@ -17,7 +18,8 @@ module.exports = {
   duplicateId,
   notFound,
   invalidParameter,
-  incorrectType
+  incorrectType,
+  requiredProperty
 };
 
 function validatePresenceOfAll(parameters, object) {
@@ -90,5 +92,13 @@ function notFound({ entityName, id }) {
     code: NOT_FOUND,
     id,
     entityName
+  });
+}
+
+function requiredProperty({ property }) {
+  return buildError({
+    message: `missing required property '${property}'`,
+    code: REQUIRED_PROPERTY,
+    property
   });
 }

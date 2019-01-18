@@ -17,9 +17,9 @@ describe(combineValidators, () => {
         });
 
         describe("and the result is falsy", () => {
-          it("should return the result of the single validator", () => {
+          it("should return null", () => {
             const validate = combineValidators([() => false]);
-            expect(validate(3)).toEqual(false);
+            expect(validate(3)).toEqual(null);
           });
         });
 
@@ -122,9 +122,9 @@ describe(combineValidators, () => {
         });
 
         describe("and the resolved result is falsy", () => {
-          it("should resolve to the result of the single validator", async () => {
+          it("should resolve to null", async () => {
             const validate = combineValidators([async () => false]);
-            expect(await validate(3)).toEqual(false);
+            expect(await validate(3)).toEqual(null);
           });
         });
 
