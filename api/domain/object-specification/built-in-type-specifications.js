@@ -1,5 +1,4 @@
 const { Specification } = require("./specification");
-const { combineValidators } = require("./combine-validators");
 const { incorrectType } = require("../errors/validation");
 
 module.exports = {
@@ -10,18 +9,14 @@ module.exports = {
 };
 
 function BuiltInTypeSpecification(type) {
-  return ({ optional, defaultValue, generate, properties, validate } = {}) =>
+  return ({ optional, defaultValue, generate, properties } = {}) =>
     Specification({
       type,
       optional,
       defaultValue,
       generate,
       properties,
-      validate: !validate
-        ? validateType(type)
-        : combineValidators([validateType(type), validate], {
-            sequentially: true
-          })
+      validate: validateType(type)
     });
 }
 

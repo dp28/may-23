@@ -61,21 +61,6 @@ function itShouldBehaveLikeABuiltInTypeSpecification({
     ).toEqual(properties);
   });
 
-  describe("if another validate function is passed in", () => {
-    const error = cannotBeBlank({ parameter: "a" });
-    const specification = buildSpecification({ validate: () => error });
-
-    it("should run the type validation first", () => {
-      expect(findErrors({ specification }, nonTypeExample).code).toEqual(
-        INCORRECT_TYPE
-      );
-    });
-
-    it("should run the other validation second", () => {
-      expect(findErrors({ specification }, example)).toEqual(error);
-    });
-  });
-
   describe(`when validating against a non-${type} value`, () => {
     itShouldBeAnIncorrectTypeError({
       error: findErrors(
