@@ -19,7 +19,8 @@ module.exports = {
   notFound,
   invalidParameter,
   incorrectType,
-  requiredProperty
+  requiredProperty,
+  cannotBeBlank
 };
 
 function validatePresenceOfAll(parameters, object) {
@@ -60,9 +61,12 @@ function invalidParameter({ reason, parameter }) {
   });
 }
 
-function incorrectType({ expected, parameter }) {
+function incorrectType({ expected, parameter = null }) {
+  const message = parameter
+    ? `incorrect type for '${parameter}' parameter, expected ${expected}`
+    : `incorrect type, expected ${expected}`;
   return buildError({
-    message: `incorrect value for '${parameter}' parameter, expected ${expected}`,
+    message,
     code: INCORRECT_TYPE,
     parameter,
     expected
